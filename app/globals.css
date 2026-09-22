@@ -15,12 +15,12 @@
   --foreground: #111111;
   --muted: #6b7280;
   --border: #e8e8e8;
-  --accent: #159f91;
+  --accent: #0f9d8a;
   --accent-foreground: #ffffff;
   --accent-subtle: #e8f7f4;
   --destructive: #ba1a1a;
   --destructive-foreground: #ffffff;
-  --ring: #159f91;
+  --ring: #0f9d8a;
 
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -28,9 +28,7 @@
   --radius-xl: 16px;
 
   --shadow-subtle: 0 1px 2px rgb(17 17 17 / 0.04);
-  --shadow-elevated:
-    0 16px 36px -8px rgb(17 17 17 / 0.06),
-    0 0 0 1px #e8e8e8;
+  --shadow-elevated: 0 16px 36px -8px rgb(17 17 17 / 0.06);
 }
 
 .dark {
@@ -49,9 +47,7 @@
   --ring: #19b89f;
 
   --shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-elevated:
-    0 16px 36px -8px rgb(0 0 0 / 0.45),
-    0 0 0 1px #252c29;
+  --shadow-elevated: 0 16px 36px -8px rgb(0 0 0 / 0.45);
 }
 
 @theme inline {
@@ -96,6 +92,8 @@
     font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Ambient decorative glows must never cause horizontal scroll */
+    overflow-x: clip;
   }
 
   ::selection {
@@ -178,5 +176,63 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------- */
+/* Gentle float for hero stage satellites (canonical landing) */
+/* ---------------------------------- */
+
+@keyframes rontee-float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes rontee-float-delayed {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@utility animate-float-slow {
+  animation: rontee-float-slow 7s ease-in-out infinite;
+}
+
+@utility animate-float-delayed {
+  animation: rontee-float-delayed 8s ease-in-out 1.2s infinite;
+}
+
+/* Gentle bell sway for notification icons */
+@utility animate-icon-sway {
+  animation: rontee-icon-sway 4.5s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes rontee-icon-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  8% {
+    transform: rotate(10deg);
+  }
+  16% {
+    transform: rotate(-8deg);
+  }
+  24% {
+    transform: rotate(5deg);
+  }
+  32%,
+  100% {
+    transform: rotate(0deg);
   }
 }

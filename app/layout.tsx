@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 
+import { MotionProvider } from "@/components/providers/motion-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +33,9 @@ export default function RootLayout({
           "flex min-h-full flex-col bg-background font-sans text-foreground antialiased",
         )}
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

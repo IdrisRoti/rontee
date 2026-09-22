@@ -12,7 +12,7 @@ export const ronteeTokens = {
     foreground: "#111111",
     muted: "#6B7280",
     border: "#E8E8E8",
-    accent: "#159F91",
+    accent: "#0F9D8A",
     accentForeground: "#FFFFFF",
     accentSubtle: "#E8F7F4",
   },
