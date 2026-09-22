@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ICON_SIZES } from "@/lib/icons";
-import { Stagger, StaggerItem } from "@/components/shared/motion";
+import { Stagger, StaggerItem, Typewriter } from "@/components/shared/motion";
 import { MemoryStage } from "./memory-stage";
 
 const REASSURANCES = [
@@ -24,11 +24,14 @@ export function Hero() {
           delay={0.05}
           className="mx-auto flex max-w-3xl flex-col items-center text-center"
         >
-          <StaggerItem>
-            <p className="mb-3 text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:mb-4 sm:text-xs">
-              Your personal memory assistant
-            </p>
-          </StaggerItem>
+          <div className="mb-3 sm:mb-4">
+            <Typewriter
+              text="Your personal memory assistant"
+              delay={0.35}
+              speed={34}
+              className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:text-xs"
+            />
+          </div>
 
           <StaggerItem>
             <h1
@@ -60,7 +63,7 @@ export function Hero() {
               <Button
                 asChild
                 variant="ghost"
-                className="group w-full px-6 py-3 text-[14px] font-semibold sm:w-auto sm:py-3.5 sm:text-[15px]"
+                className="group w-full rounded-full px-6 py-3 text-[14px] font-semibold sm:w-auto sm:py-3.5 sm:text-[15px]"
               >
                 <Link href="#how-it-works">
                   See how it works

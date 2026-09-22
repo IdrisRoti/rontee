@@ -2,7 +2,7 @@ import Image from "next/image";
 import { BadgeCheck, BellRing, Cake, CreditCard } from "lucide-react";
 
 import { ICON_SIZES } from "@/lib/icons";
-import { FadeUp } from "@/components/shared/motion";
+import { FadeUp, Meter, Typewriter } from "@/components/shared/motion";
 
 /**
  * Editorial memory visualization stage from the canonical final Stitch hero.
@@ -126,13 +126,12 @@ export function MemoryStage() {
             </span>
             <span>Sep 21 notice</span>
           </div>
-          <div
-            className="relative h-1.5 w-full overflow-hidden rounded-full bg-border"
-            role="img"
-            aria-label="Reminder progress: notice arrives 7 days before September 28"
-          >
-            <div className="absolute top-0 bottom-0 left-0 w-[72%] rounded-full bg-accent" />
-          </div>
+          <Meter
+            value={72}
+            trackClassName="relative h-1.5 w-full overflow-hidden rounded-full bg-border"
+            barClassName="absolute top-0 bottom-0 left-0 rounded-full bg-accent"
+            label="Reminder progress: notice arrives 7 days before September 28"
+          />
         </div>
 
         <div className="mt-3.5 flex items-center gap-3 rounded-xl bg-surface-subtle p-3 lg:mt-5 lg:gap-3.5 lg:rounded-2xl lg:p-3.5">
@@ -149,11 +148,18 @@ export function MemoryStage() {
             </span>
             <span className="mt-0.5 block truncate text-[11px] leading-snug text-muted lg:text-xs lg:whitespace-normal">
               <span className="lg:hidden">
-                &ldquo;Source vintage 1964 Miles Davis vinyl.&rdquo;
+                <Typewriter
+                  text="“Source vintage 1964 Miles Davis vinyl.”"
+                  delay={1.1}
+                  speed={22}
+                />
               </span>
               <span className="hidden lg:inline">
-                &ldquo;Source vintage 1964 Miles Davis vinyl &amp; book harbor
-                table.&rdquo;
+                <Typewriter
+                  text="“Source vintage 1964 Miles Davis vinyl & book harbor table.”"
+                  delay={1.1}
+                  speed={22}
+                />
               </span>
             </span>
           </span>
