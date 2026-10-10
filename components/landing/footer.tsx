@@ -5,7 +5,7 @@ import { Logo } from "@/components/shared/logo";
 const FOOTER_LINKS = [
   { label: "How it works", href: "#how-it-works", accent: false },
   { label: "What to remember", href: "#what-to-remember", accent: false },
-  { label: "Log in", href: "#login", accent: false },
+  { label: "Log in", href: "/login", accent: false },
   { label: "Create a reminder", href: "/reminders/new", accent: true },
   { label: "Privacy", href: "#", accent: false },
   { label: "Terms", href: "#", accent: false },

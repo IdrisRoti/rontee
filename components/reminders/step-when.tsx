@@ -64,7 +64,7 @@ export function StepWhen({
         <span className="mb-2 inline-block text-[11px] font-bold tracking-wider text-accent-soft uppercase">
           Step 2 of 3 · Date
         </span>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[42px] lg:leading-tight">
+        <h1 id="wizard-heading" tabIndex={-1} className="text-3xl font-bold tracking-tight text-foreground outline-none sm:text-4xl lg:text-[42px] lg:leading-tight">
           When is it?
         </h1>
         <p className="mt-2 text-base font-normal text-muted sm:text-lg">

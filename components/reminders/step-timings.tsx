@@ -40,14 +40,14 @@ export function StepTimings({
 }: StepTimingsProps) {
   return (
     <FadeUp y={20} className="flex w-full flex-col items-center">
-      <div className="mb-8 w-full text-center">
+      <div className="mb-8 w-full text-left">
         <div className="mb-3 text-xs font-semibold tracking-wider text-accent-soft uppercase">
           Step 3 of 3 · Remind
         </div>
-        <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+        <h1 id="wizard-heading" tabIndex={-1} className="mb-3 text-3xl font-bold tracking-tight text-foreground outline-none md:text-4xl">
           When should we remind you?
         </h1>
-        <p className="mx-auto max-w-md text-base leading-relaxed text-muted">
+        <p className="max-w-md text-base leading-relaxed text-muted">
           Choose when Rontee should remind you before the date.
         </p>
       </div>

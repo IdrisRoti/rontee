@@ -43,7 +43,7 @@ export function ReadySaved({
       <p className="mb-2 text-xs font-semibold tracking-widest text-accent-soft uppercase">
         Reminder saved · Confirmation
       </p>
-      <h1 className="mb-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+      <h1 id="wizard-heading" tabIndex={-1} className="mb-3 text-3xl font-bold tracking-tight text-foreground outline-none sm:text-4xl">
         Your reminder is saved.
       </h1>
       <p className="mb-8 max-w-md text-sm leading-relaxed text-muted">
@@ -81,18 +81,18 @@ export function ReadySaved({
             {timings.map((offset) => (
               <div
                 key={offset}
-                className="flex items-center gap-2 rounded-lg border border-border bg-surface-subtle px-3 py-2 text-xs font-medium"
+                className="flex items-center gap-2 rounded-lg border border-border bg-surface-subtle p-3 text-xs font-medium sm:px-3 sm:py-2"
               >
                 <Check
                   size={ICON_SIZES.compact}
                   aria-hidden
                   className="shrink-0 text-accent-soft"
                 />
-                <span className="leading-tight">
-                  <span className="block font-semibold text-foreground">
+                <span className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:flex-col sm:items-start sm:gap-0">
+                  <span className="truncate font-semibold text-foreground">
                     {timingLabel(offset)}
                   </span>
-                  <span className="mt-0.5 block text-[10px] text-muted">
+                  <span className="shrink-0 text-xs font-normal text-muted sm:mt-0.5 sm:text-[10px]">
                     {formatTimingDate(date, offset)}
                   </span>
                 </span>

@@ -73,3 +73,53 @@ export function timingDate(remembered: Date, offset: TimingOffset): Date {
 export function formatTimingDate(remembered: Date, offset: TimingOffset): string {
   return format(timingDate(remembered, offset), "MMM d, yyyy");
 }
+
+const DRAFT_STORAGE_KEY = "rontee:reminder-draft";
+
+type StoredDraft = {
+  what: string;
+  date: string | null;
+  repeat: RepeatOption;
+  timings: TimingOffset[];
+};
+
+/** Holds the guest draft across the signup detour (client only). */
+export function saveDraft(draft: ReminderDraft): void {
+  try {
+    const stored: StoredDraft = {
+      what: draft.what,
+      date: draft.date ? draft.date.toISOString() : null,
+      repeat: draft.repeat,
+      timings: draft.timings,
+    };
+    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(stored));
+  } catch {
+    // Private mode / quota — the flow still works in-memory.
+  }
+}
+
+/** Restores a held draft, or null when absent/invalid/expired shape. */
+export function loadDraft(): ReminderDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<StoredDraft>;
+    const date = parsed.date ? new Date(parsed.date) : null;
+    if (!parsed.what?.trim() || !date || Number.isNaN(date.getTime()))
+      return null;
+    const repeat: RepeatOption =
+      parsed.repeat === "once" ||
+      parsed.repeat === "weekly" ||
+      parsed.repeat === "monthly" ||
+      parsed.repeat === "yearly"
+        ? parsed.repeat
+        : "yearly";
+    const timings = (parsed.timings ?? []).filter((t): t is TimingOffset =>
+      (TIMING_OFFSETS as readonly number[]).includes(t),
+    );
+    if (timings.length === 0) return null;
+    return { what: parsed.what.slice(0, 280), date, repeat, timings };
+  } catch {
+    return null;
+  }
+}

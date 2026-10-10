@@ -29,7 +29,10 @@ export function StepWhat({ value, onChange, onContinue }: StepWhatProps) {
   return (
     <FadeUp y={20} className="flex w-full flex-col">
       <div className="mb-8 text-left">
-        <h1 className="text-[34px] leading-[1.15] font-bold tracking-tight text-foreground sm:text-[42px]">
+        <span className="mb-2 inline-block text-[11px] font-bold tracking-wider text-accent-soft uppercase">
+          Step 1 of 3 · Remember
+        </span>
+        <h1 id="wizard-heading" tabIndex={-1} className="text-[34px] leading-[1.15] font-bold tracking-tight text-foreground outline-none sm:text-[42px]">
           What do you want Rontee to remember?
         </h1>
         <p className="mt-3 text-base leading-relaxed font-normal text-muted sm:text-lg">

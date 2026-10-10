@@ -12,6 +12,8 @@ import { StepWhen } from "./step-when";
 import {
   EMPTY_DRAFT,
   TIMING_OFFSETS,
+  loadDraft,
+  saveDraft,
   type ReminderDraft,
   type RepeatOption,
   type TimingOffset,
@@ -33,12 +35,38 @@ function sortTimings(timings: TimingOffset[]): TimingOffset[] {
  */
 export function ReminderWizard() {
   const searchParams = useSearchParams();
-  const [step, setStep] = React.useState<WizardStep>(1);
-  const [draft, setDraft] = React.useState<ReminderDraft>(() => ({
-    ...EMPTY_DRAFT,
-    timings: [...EMPTY_DRAFT.timings],
-    what: (searchParams.get("q") ?? "").slice(0, 280),
-  }));
+  // Returning from signup (`?recovered=1`): restore the held draft and
+  // land on the saved confirmation. Lazy init (no post-hydration effect):
+  // the wizard renders inside a Suspense boundary, so this runs on the
+  // client where storage is available.
+  const getRecovered = () => {
+    if (searchParams.get("recovered") !== "1") return null;
+    if (typeof window === "undefined") return null;
+    return loadDraft();
+  };
+  const [step, setStep] = React.useState<WizardStep>(() =>
+    getRecovered() ? "saved" : 1,
+  );
+  const [draft, setDraft] = React.useState<ReminderDraft>(() => {
+    const held = getRecovered();
+    if (held) return held;
+    return {
+      ...EMPTY_DRAFT,
+      timings: [...EMPTY_DRAFT.timings],
+      what: (searchParams.get("q") ?? "").slice(0, 280),
+    };
+  });
+
+  // Hold the draft while the guest creates an account.
+  React.useEffect(() => {
+    if (step === "ready") saveDraft(draft);
+  }, [step, draft]);
+
+  // Each step starts at the top of the page, with focus on its heading.
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+    document.getElementById("wizard-heading")?.focus({ preventScroll: true });
+  }, [step]);
 
   const setWhat = (what: string) =>
     setDraft((d) => ({ ...d, what: what.slice(0, 280) }));
@@ -106,7 +134,6 @@ export function ReminderWizard() {
           date={draft.date}
           repeat={draft.repeat}
           timings={draft.timings}
-          onAccountCreated={() => setStep("saved")}
         />
       )}
 

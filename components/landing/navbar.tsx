@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
   { label: "What to remember", href: "#what-to-remember" },
-  { label: "Log in", href: "#login" },
+  { label: "Log in", href: "/login" },
 ] as const;
 
 type ThemeChoice = "light" | "system" | "dark";
