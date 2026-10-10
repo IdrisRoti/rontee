@@ -11,9 +11,9 @@ import { WhatToRemember } from "@/components/landing/what-to-remember";
  */
 export default function Home() {
   return (
-    <div className="flex min-h-full flex-col bg-background text-foreground">
+    <div className="flex min-h-full w-full max-w-full flex-col overflow-x-clip bg-background text-foreground">
       <Navbar />
-      <main className="flex flex-1 flex-col">
+      <main className="flex w-full max-w-full flex-1 flex-col overflow-x-clip">
         <Hero />
         <HowItWorks />
         <WhatToRemember />

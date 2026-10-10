@@ -6,7 +6,7 @@ const FOOTER_LINKS = [
   { label: "How it works", href: "#how-it-works", accent: false },
   { label: "What to remember", href: "#what-to-remember", accent: false },
   { label: "Log in", href: "#login", accent: false },
-  { label: "Create a reminder", href: "#cta", accent: true },
+  { label: "Create a reminder", href: "/reminders/new", accent: true },
   { label: "Privacy", href: "#", accent: false },
   { label: "Terms", href: "#", accent: false },
 ] as const;
@@ -17,8 +17,8 @@ const FOOTER_LINKS = [
  */
 export function Footer() {
   return (
-    <footer className="w-full border-t border-border bg-surface px-5 py-8 transition-colors sm:px-8 sm:py-12 lg:px-10">
-      <div className="mx-auto flex max-w-md flex-col items-center gap-4 text-center sm:max-w-[1280px] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:text-left">
+    <footer className="w-full max-w-full overflow-x-clip border-t border-border bg-surface px-5 py-8 transition-colors sm:px-8 sm:py-12 lg:px-10">
+      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 text-center sm:max-w-[1280px] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:text-left">
         <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-4">
           <Link href="#" aria-label="Rontee home" className="rounded-md">
             <span className="[&_svg]:h-6">
@@ -46,7 +46,7 @@ export function Footer() {
               href={link.href}
               className={
                 link.accent
-                  ? "text-accent transition-opacity hover:opacity-80"
+                  ? "text-accent-soft transition-opacity hover:opacity-80"
                   : "transition-colors hover:text-foreground"
               }
             >

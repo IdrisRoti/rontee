@@ -18,8 +18,8 @@ const REASSURANCES = [
  */
 export function Hero() {
   return (
-    <section aria-labelledby="hero-heading" className="relative">
-      <div className="mx-auto max-w-md px-4 pt-10 pb-16 sm:max-w-[1280px] sm:px-6 sm:pt-12 sm:pb-20 lg:px-8 lg:pt-16">
+    <section aria-labelledby="hero-heading" className="relative w-full max-w-full overflow-x-clip">
+      <div className="mx-auto w-full max-w-md px-4 pt-10 pb-16 sm:max-w-[1280px] sm:px-6 sm:pt-12 sm:pb-20 lg:px-8 lg:pt-16">
         <Stagger
           delay={0.05}
           className="mx-auto flex max-w-3xl flex-col items-center text-center"
@@ -29,7 +29,7 @@ export function Hero() {
               text="Your personal memory assistant"
               delay={0.35}
               speed={34}
-              className="text-[11px] font-semibold tracking-[0.2em] text-accent uppercase sm:text-xs"
+              className="text-[11px] font-semibold tracking-[0.2em] text-accent-soft uppercase sm:text-xs"
             />
           </div>
 
@@ -55,7 +55,7 @@ export function Hero() {
                 asChild
                 className="w-full rounded-full px-6 py-3.5 text-[15px] shadow-elevated sm:w-auto sm:px-7 sm:hover:-translate-y-0.5"
               >
-                <Link href="#cta">
+                <Link href="/reminders/new">
                   Create a reminder
                   <ArrowRight size={ICON_SIZES.default} aria-hidden />
                 </Link>

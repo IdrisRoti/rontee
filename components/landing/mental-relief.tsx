@@ -76,7 +76,7 @@ export function MentalRelief() {
 
           {/* Transition arrow */}
           <div className="flex justify-center py-1 md:col-span-2 md:py-0">
-            <span className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-surface text-accent shadow-subtle sm:size-10">
+            <span className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-surface text-accent-soft shadow-subtle sm:size-10">
               <ArrowDown
                 size={20}
                 aria-hidden
@@ -92,7 +92,7 @@ export function MentalRelief() {
 
           {/* Peace of mind */}
           <div className="rounded-2xl border border-border bg-surface p-4 text-left sm:p-6 md:col-span-5">
-            <span className="mb-1 block text-[10px] font-semibold tracking-wider text-accent uppercase sm:mb-2 sm:text-[11px]">
+            <span className="mb-1 block text-[10px] font-semibold tracking-wider text-accent-soft uppercase sm:mb-2 sm:text-[11px]">
               Peace of mind with Rontee
             </span>
             <p className="text-sm font-bold text-foreground">

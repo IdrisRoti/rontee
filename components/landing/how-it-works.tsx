@@ -10,11 +10,11 @@ const STEPS = [
       "Tell Rontee what you don\u2019t want to forget in your own words.",
     Icon: NotebookPen,
     preview: (
-      <div className="flex items-center gap-2 rounded-xl bg-surface-subtle px-3.5 py-2.5 text-xs font-medium text-foreground sm:px-4 sm:py-3 sm:text-sm">
-        <span aria-hidden className="text-base leading-none text-accent sm:text-lg">
+      <div className="flex min-w-0 items-center gap-2 rounded-xl bg-surface-subtle px-3.5 py-2.5 text-xs font-medium text-foreground sm:px-4 sm:py-3 sm:text-sm">
+        <span aria-hidden className="shrink-0 text-base leading-none text-accent-soft sm:text-lg">
           &ldquo;
         </span>
-        <span className="truncate">
+        <span className="min-w-0 flex-1 truncate">
           <Typewriter
             text="Dad’s 60th birthday on September 28th"
             delay={0.3}
@@ -71,9 +71,9 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className="border-t border-border px-4 py-14 sm:px-8 sm:py-24"
+      className="w-full max-w-full overflow-x-clip border-t border-border px-4 py-14 sm:px-8 sm:py-24"
     >
-      <div className="mx-auto max-w-[1280px]">
+      <div className="mx-auto w-full max-w-[1280px] min-w-0">
         <Reveal className="mb-8 sm:mb-16 sm:flex sm:flex-col sm:gap-6 sm:text-left md:flex-row md:items-end md:justify-between">
           <h2
             id="how-it-works-heading"
@@ -109,7 +109,7 @@ export function HowItWorks() {
                   >
                     {step.number}
                   </span>
-                  <span className="flex size-8 items-center justify-center rounded-full bg-accent-subtle text-accent sm:size-9">
+                  <span className="flex size-8 items-center justify-center rounded-full bg-accent-subtle text-accent-soft sm:size-9">
                     <step.Icon size={18} aria-hidden className="sm:size-[19px]" />
                   </span>
                 </div>

@@ -42,7 +42,7 @@ export function WhatToRemember() {
     <section
       id="what-to-remember"
       aria-labelledby="what-to-remember-heading"
-      className="mx-auto max-w-md border-t border-border px-4 py-14 sm:max-w-[1280px] sm:px-8 sm:py-24"
+      className="mx-auto w-full max-w-md overflow-x-clip border-t border-border px-4 py-14 sm:max-w-[1280px] sm:px-8 sm:py-24"
     >
       <Reveal className="mb-8 max-w-2xl sm:mb-14">
         <h2
@@ -62,7 +62,7 @@ export function WhatToRemember() {
           <div className="flex h-full flex-col justify-between overflow-hidden rounded-3xl bg-surface-subtle transition-colors">
             <div className="p-5 sm:p-8 lg:p-10">
               <div className="mb-2 flex items-center justify-between sm:mb-4">
-                <span className="text-[11px] font-semibold text-accent sm:text-xs">
+                <span className="text-[11px] font-semibold text-accent-soft sm:text-xs">
                   Life Milestones
                 </span>
                 <span className="text-[11px] text-muted sm:text-xs">
@@ -86,15 +86,15 @@ export function WhatToRemember() {
                   height={896}
                   className="h-full w-full object-cover object-center"
                 />
-                <div className="absolute right-2 bottom-2 left-2 flex items-center justify-between rounded-xl bg-surface/95 px-3 py-2 text-[11px] text-foreground backdrop-blur-sm sm:right-3 sm:bottom-3 sm:left-3 sm:px-4 sm:py-2.5 sm:text-xs">
-                  <span className="mr-2 truncate italic">
+                <div className="absolute right-2 bottom-2 left-2 flex min-w-0 items-center justify-between rounded-xl bg-surface/95 px-3 py-2 text-[11px] text-foreground backdrop-blur-sm sm:right-3 sm:bottom-3 sm:left-3 sm:px-4 sm:py-2.5 sm:text-xs">
+                  <span className="mr-2 min-w-0 flex-1 truncate italic">
                     <Typewriter
                       text="“Attached note: He mentioned wanting a 1964 Miles Davis vinyl.”"
                       delay={0.4}
                       speed={26}
                     />
                   </span>
-                  <span className="ml-3 shrink-0 font-semibold text-accent">
+                  <span className="ml-3 shrink-0 font-semibold text-accent-soft">
                     14-day notice
                   </span>
                 </div>
@@ -108,7 +108,7 @@ export function WhatToRemember() {
           <div className="flex h-full flex-col justify-between rounded-3xl border border-border bg-surface p-5 transition-colors sm:p-8 lg:p-10">
             <div>
               <div className="mb-2 flex items-center justify-between sm:mb-4">
-                <span className="text-[11px] font-semibold text-accent sm:text-xs">
+                <span className="text-[11px] font-semibold text-accent-soft sm:text-xs">
                   Official Documents
                 </span>
                 <span className="text-[11px] text-muted sm:text-xs">
@@ -167,13 +167,13 @@ export function WhatToRemember() {
                   : "md:border-0")
               }
             >
-              <span className="order-1 flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-subtle text-accent">
+              <span className="order-1 flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-subtle text-accent-soft">
                 <cat.Icon size={18} aria-hidden />
               </span>
               <span
                 className={
                   "order-3 shrink-0 text-[11px] font-semibold md:order-2 md:ml-auto md:text-xs " +
-                  (cat.bufferAccent ? "text-accent" : "text-muted")
+                  (cat.bufferAccent ? "text-accent-soft" : "text-muted")
                 }
               >
                 {cat.buffer}

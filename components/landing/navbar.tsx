@@ -33,7 +33,7 @@ const THEME_OPTIONS: ReadonlyArray<{
  * Theme dropdown from the canonical landing spec:
  * Light / System / Dark, closes on outside click or Escape.
  */
-function ThemeMenu() {
+export function ThemeMenu() {
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = React.useState(false);
   const mounted = React.useSyncExternalStore(
@@ -163,7 +163,7 @@ export function Navbar() {
             asChild
             className="hidden rounded-full px-5 sm:px-6 md:inline-flex"
           >
-            <Link href="#cta">Create a reminder</Link>
+            <Link href="/reminders/new">Create a reminder</Link>
           </Button>
 
           <Button
@@ -207,7 +207,7 @@ export function Navbar() {
             ))}
           </nav>
           <Button asChild className="w-full rounded-full py-3">
-            <Link href="#cta" onClick={() => setOpen(false)}>
+            <Link href="/reminders/new" onClick={() => setOpen(false)}>
               Create a reminder
             </Link>
           </Button>

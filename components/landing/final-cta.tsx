@@ -1,23 +1,25 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Pen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/motion";
 
 /**
- * Closing CTA — canonical quick-create panel.
- * Visual only until reminders are implemented (submits nowhere).
+ * Closing CTA — quick-create panel. Hands the typed text to the
+ * guest create-reminder flow as `?q=` so step 1 starts prefilled.
  */
 export function FinalCta() {
   const [value, setValue] = React.useState("");
+  const router = useRouter();
 
   return (
     <section
       id="cta"
       aria-labelledby="cta-heading"
-      className="mx-auto max-w-md px-4 pb-16 sm:max-w-[1280px] sm:px-8 sm:pb-28"
+      className="mx-auto w-full max-w-md overflow-x-clip px-4 pb-16 sm:max-w-[1280px] sm:px-8 sm:pb-28"
     >
       <Reveal>
         <div className="rounded-3xl bg-surface-subtle px-5 py-10 text-center transition-colors sm:mx-auto sm:max-w-4xl sm:px-12 sm:py-20">
@@ -34,10 +36,18 @@ export function FinalCta() {
 
           <form
             className="mx-auto mt-6 flex max-w-xl flex-col gap-2.5 sm:mt-8"
-            onSubmit={(event) => event.preventDefault()}
+            onSubmit={(event) => {
+              event.preventDefault();
+              const query = value.trim();
+              router.push(
+                query
+                  ? `/reminders/new?q=${encodeURIComponent(query)}`
+                  : "/reminders/new",
+              );
+            }}
           >
             <div className="flex flex-col gap-2.5 sm:-skew-x-[4deg] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:border sm:border-border sm:bg-surface sm:p-1.5 sm:px-3 sm:shadow-subtle sm:transition-all sm:focus-within:border-accent">
-              <div className="flex items-center rounded-2xl border border-border bg-surface px-3.5 py-1 shadow-subtle transition-colors focus-within:border-accent sm:flex-1 sm:skew-x-[4deg] sm:rounded-full sm:border-0 sm:bg-transparent sm:shadow-none sm:focus-within:border-0">
+              <div className="flex min-w-0 items-center rounded-2xl border border-border bg-surface px-3.5 py-1 shadow-subtle transition-colors focus-within:border-accent sm:flex-1 sm:skew-x-[4deg] sm:rounded-full sm:border-0 sm:bg-transparent sm:shadow-none sm:focus-within:border-0">
                 <Pen
                   size={12}
                   aria-hidden
@@ -54,7 +64,7 @@ export function FinalCta() {
                   onChange={(event) => setValue(event.target.value)}
                   placeholder="What would you like Rontee to remember?"
                   autoComplete="off"
-                  className="w-full border-0 bg-transparent py-2.5 text-xs font-medium text-foreground outline-none placeholder:text-muted sm:py-3 sm:text-sm"
+                  className="w-full min-w-0 border-0 bg-transparent py-2.5 text-xs font-medium text-foreground outline-none placeholder:text-muted sm:py-3 sm:text-sm"
                 />
               </div>
               <Button

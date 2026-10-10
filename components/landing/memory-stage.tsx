@@ -13,12 +13,12 @@ export function MemoryStage() {
     <FadeUp
       delay={0.35}
       y={32}
-      className="relative mx-auto mt-8 flex w-full max-w-[1100px] flex-col gap-3 overflow-visible rounded-3xl bg-surface-subtle p-4 transition-colors sm:mt-12 lg:block lg:min-h-[540px] lg:items-center lg:justify-center lg:gap-0 lg:p-12 isolate"
+      className="relative mx-auto mt-8 flex w-full max-w-full flex-col gap-3 overflow-hidden rounded-3xl bg-surface-subtle p-4 transition-colors sm:mt-12 lg:block lg:max-w-[1100px] lg:min-h-[540px] lg:items-center lg:justify-center lg:gap-0 lg:overflow-visible lg:p-12 isolate"
     >
       {/* Ambient gentle glow inside stage — behind content on all breakpoints */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-16 left-1/3 -z-10 size-80 rounded-full bg-accent-subtle blur-3xl"
+        className="pointer-events-none absolute -top-10 left-1/2 -z-10 size-64 -translate-x-1/2 rounded-full bg-accent-subtle blur-3xl lg:-top-16 lg:left-1/3 lg:size-80 lg:translate-x-0"
       />
 
       {/* Floating fragment: travel */}
@@ -48,7 +48,7 @@ export function MemoryStage() {
         className="lg:absolute lg:top-4 lg:right-10 lg:z-20"
       >
         <div className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-surface p-3.5 shadow-elevated lg:w-[290px] lg:gap-3.5 lg:p-4 xl:w-[310px] lg:animate-float-slow">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent-subtle text-accent lg:size-10">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-accent-subtle text-accent-soft lg:size-10">
             <BadgeCheck size={18} aria-hidden />
           </span>
           <span className="min-w-0 flex-1">
@@ -56,7 +56,7 @@ export function MemoryStage() {
               <span className="truncate text-[13px] font-bold text-foreground">
                 Passport Renewal
               </span>
-              <span className="shrink-0 text-[11px] font-semibold whitespace-nowrap text-accent">
+              <span className="shrink-0 text-[11px] font-semibold whitespace-nowrap text-accent-soft">
                 <span className="lg:hidden">6 mos prior</span>
                 <span className="hidden lg:inline">6 months prior</span>
               </span>
@@ -75,7 +75,7 @@ export function MemoryStage() {
       <div className="relative z-10 w-full rounded-2xl border border-border/50 bg-surface p-5 shadow-elevated lg:mx-auto lg:max-w-[480px] lg:rounded-3xl lg:p-8">
         <div className="flex min-w-0 flex-1 items-center justify-between gap-3 border-b border-border pb-3.5 lg:pb-5">
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-3.5">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-subtle text-accent lg:size-11 lg:rounded-2xl">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-subtle text-accent-soft lg:size-11 lg:rounded-2xl">
               <Cake size={20} aria-hidden className="lg:size-[22px]" />
             </span>
             <span className="min-w-0 flex-1">
@@ -87,7 +87,7 @@ export function MemoryStage() {
               </span>
             </span>
           </div>
-          <span className="shrink-0 rounded-full bg-accent-subtle px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-accent lg:px-3 lg:text-xs">
+          <span className="shrink-0 rounded-full bg-accent-subtle px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-accent-soft lg:px-3 lg:text-xs">
             In 12 days
           </span>
         </div>
@@ -115,7 +115,7 @@ export function MemoryStage() {
 
         <div className="py-1">
           <div className="mb-2 flex items-center justify-between text-[11px] font-medium text-muted lg:mb-2.5 lg:text-xs">
-            <span className="flex items-center gap-1.5 font-semibold text-accent">
+            <span className="flex items-center gap-1.5 font-semibold text-accent-soft">
               <BellRing
                 size={15}
                 aria-hidden
@@ -143,7 +143,7 @@ export function MemoryStage() {
             className="size-11 shrink-0 rounded-lg object-cover lg:size-12 lg:rounded-xl"
           />
           <span className="min-w-0">
-            <span className="block text-[10px] font-semibold text-accent lg:text-[11px]">
+            <span className="block text-[10px] font-semibold text-accent-soft lg:text-[11px]">
               Personal Note
             </span>
             <span className="mt-0.5 block truncate text-[11px] leading-snug text-muted lg:text-xs lg:whitespace-normal">

@@ -18,6 +18,7 @@
   --accent: #0f9d8a;
   --accent-foreground: #ffffff;
   --accent-subtle: #e8f7f4;
+  --accent-soft: #0f9d8a;
   --destructive: #ba1a1a;
   --destructive-foreground: #ffffff;
   --ring: #0f9d8a;
@@ -32,19 +33,20 @@
 }
 
 .dark {
-  --background: #0d1110;
-  --surface: #151a18;
-  --surface-subtle: #1a211e;
-  --surface-elevated: #151a18;
-  --foreground: #f5f7f6;
-  --muted: #9aa5a1;
-  --border: #252c29;
-  --accent: #19b89f;
-  --accent-foreground: #062a25;
-  --accent-subtle: #102f2a;
+  --background: #101312;
+  --surface: #191e1c;
+  --surface-subtle: #202724;
+  --surface-elevated: #202724;
+  --foreground: #f1f3f2;
+  --muted: #a0aaa5;
+  --border: #2b3430;
+  --accent: #287f70;
+  --accent-foreground: #ffffff;
+  --accent-subtle: #17463d;
+  --accent-soft: #76bdb0;
   --destructive: #e0726d;
   --destructive-foreground: #2b0505;
-  --ring: #19b89f;
+  --ring: #287f70;
 
   --shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-elevated: 0 16px 36px -8px rgb(0 0 0 / 0.45);
@@ -61,6 +63,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-subtle: var(--accent-subtle);
+  --color-accent-soft: var(--accent-soft);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-ring: var(--ring);
@@ -84,6 +87,9 @@
 
   html {
     scroll-behavior: smooth;
+    /* Must match body: absolute glows + motion transforms must never
+       create a horizontal scrollbar on mobile (360-390px). */
+    overflow-x: clip;
   }
 
   body {
@@ -94,6 +100,8 @@
     text-rendering: optimizeLegibility;
     /* Ambient decorative glows must never cause horizontal scroll */
     overflow-x: clip;
+    /* Flex column page root should never exceed the viewport width */
+    max-width: 100%;
   }
 
   ::selection {
