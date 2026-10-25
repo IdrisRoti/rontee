@@ -1,26 +1,88 @@
+import type { Metadata } from "next";
+
+import { Faq } from "@/components/landing/faq";
+import { FAQS } from "@/components/landing/faq-data";
 import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { MentalRelief } from "@/components/landing/mental-relief";
+import { Manifesto } from "@/components/landing/manifesto";
+import { Marquee } from "@/components/landing/marquee";
 import { Navbar } from "@/components/landing/navbar";
-import { WhatToRemember } from "@/components/landing/what-to-remember";
+import { Unburden } from "@/components/landing/unburden";
+import { UseCases } from "@/components/landing/use-cases";
+import { SmoothScroll } from "@/components/providers/smooth-scroll";
+import { site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      url: site.url,
+      name: site.name,
+      description: site.description,
+      inLanguage: "en",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      logo: `${site.url}/icon.svg`,
+      slogan: site.tagline,
+    },
+    {
+      "@type": "WebApplication",
+      name: site.name,
+      url: site.url,
+      description: site.description,
+      applicationCategory: "LifestyleApplication",
+      operatingSystem: "Any (web browser)",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      publisher: { "@id": `${site.url}/#organization` },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQS.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
+  ],
+};
 
 /**
- * Canonical final landing page, built section by section from Stitch.
+ * Landing: light editorial page with two dark cinematic acts
+ * (Unburden, closing CTA + footer). Lenis smooth scroll is scoped here.
  */
 export default function Home() {
   return (
-    <div className="flex min-h-full w-full max-w-full flex-col overflow-x-clip bg-background text-foreground">
+    <SmoothScroll>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Navbar />
-      <main className="flex w-full max-w-full flex-1 flex-col overflow-x-clip">
+      <main className="block w-full">
         <Hero />
+        <Marquee />
+        <Manifesto />
         <HowItWorks />
-        <WhatToRemember />
-        <MentalRelief />
-        <FinalCta />
+        <Unburden />
+        <UseCases />
+        <Faq />
       </main>
-      <Footer />
-    </div>
+      <div className="scheme-dark grain relative">
+        <FinalCta />
+        <Footer />
+      </div>
+    </SmoothScroll>
   );
 }

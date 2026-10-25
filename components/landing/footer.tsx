@@ -1,59 +1,91 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 import { Logo } from "@/components/shared/logo";
+import { ThemeMenu } from "@/components/shared/theme-menu";
 
-const FOOTER_LINKS = [
-  { label: "How it works", href: "#how-it-works", accent: false },
-  { label: "What to remember", href: "#what-to-remember", accent: false },
-  { label: "Log in", href: "/login", accent: false },
-  { label: "Create a reminder", href: "/reminders/new", accent: true },
-  { label: "Privacy", href: "#", accent: false },
-  { label: "Terms", href: "#", accent: false },
+const COLUMNS = [
+  {
+    title: "Product",
+    links: [
+      { label: "How it works", href: "#how-it-works" },
+      { label: "Use cases", href: "#use-cases" },
+      { label: "FAQ", href: "#faq" },
+      { label: "Create a reminder", href: "/reminders/new" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { label: "Sign up", href: "/signup" },
+      { label: "Log in", href: "/login" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "#" },
+      { label: "Terms", href: "#" },
+    ],
+  },
 ] as const;
 
-/**
- * Quiet landing footer — canonical links and tagline.
- * Mobile: centered stack. Desktop: spacious row.
- */
+/** Dark footer with link columns and an oversized wordmark that rises into place. */
 export function Footer() {
+  const ref = React.useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end end"] });
+  const y = useTransform(scrollYProgress, [0, 1], [reduce ? "0%" : "45%", "0%"]);
+
   return (
-    <footer className="w-full max-w-full overflow-x-clip border-t border-border bg-surface px-5 py-8 transition-colors sm:px-8 sm:py-12 lg:px-10">
-      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 text-center sm:max-w-[1280px] sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:text-left">
-        <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <Link href="#" aria-label="Rontee home" className="rounded-md">
-            <span className="[&_svg]:h-6">
-              <Logo />
-            </span>
-          </Link>
-          <span
-            aria-hidden
-            className="hidden text-border sm:inline"
-          >
-            ·
-          </span>
-          <span className="text-xs font-medium text-muted">
-            Never forget what matters.
-          </span>
+    <footer ref={ref} className="relative overflow-hidden px-4 pt-16 sm:px-8">
+      <div className="mx-auto max-w-[1320px]">
+        <div className="grid grid-cols-2 gap-10 border-t border-border pt-12 md:grid-cols-12">
+          <div className="col-span-2 md:col-span-5">
+            <Logo />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
+              A personal memory assistant for the dates that matter.
+            </p>
+          </div>
+          {COLUMNS.map((col) => (
+            <nav key={col.title} aria-label={col.title} className="md:col-span-2">
+              <p className="type-eyebrow mb-4 text-faint">{col.title}</p>
+              <ul className="flex flex-col gap-2.5">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <Link
+                      href={l.href}
+                      className="group relative text-sm text-muted transition-colors hover:text-foreground"
+                    >
+                      {l.label}
+                      <span className="absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-out-expo group-hover:origin-left group-hover:scale-x-100" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
 
-        <nav
-          aria-label="Footer"
-          className="mt-1 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-semibold text-muted sm:mt-0 sm:gap-7"
+        <div className="mt-14 flex items-center justify-between gap-4 font-mono text-[11px] tracking-wide text-faint uppercase">
+          <span>© {new Date().getFullYear()} Rontee</span>
+          <span className="hidden sm:inline">Never forget what matters</span>
+          <ThemeMenu placement="top" />
+        </div>
+      </div>
+
+      {/* Giant wordmark */}
+      <div aria-hidden className="pointer-events-none relative mt-6 select-none">
+        <motion.p
+          style={{ y }}
+          className="flex items-end justify-center text-[29vw] leading-[0.74] font-semibold tracking-[-0.075em] text-foreground"
         >
-          {FOOTER_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className={
-                link.accent
-                  ? "text-accent-soft transition-opacity hover:opacity-80"
-                  : "transition-colors hover:text-foreground"
-              }
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+          rontee
+          <span className="mb-[0.08em] ml-[0.02em] inline-block size-[0.14em] rounded-full bg-ember" />
+        </motion.p>
       </div>
     </footer>
   );

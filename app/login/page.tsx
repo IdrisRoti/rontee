@@ -6,6 +6,7 @@ import { LoginForm } from "@/components/auth/login-form";
 export const metadata: Metadata = {
   title: "Log in",
   description: "Log in to Rontee to keep your important reminders close.",
+  alternates: { canonical: "/login" },
 };
 
 /** Standalone login from Stitch. Frontend preview until auth lands. */

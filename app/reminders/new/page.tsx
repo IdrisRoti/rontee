@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Create a reminder",
   description:
     "Tell Rontee what you don't want to forget — no account needed to start.",
+  alternates: { canonical: "/reminders/new" },
 };
 
 /**

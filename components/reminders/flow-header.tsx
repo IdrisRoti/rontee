@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 
-import { ThemeMenu } from "@/components/landing/navbar";
+import { ThemeMenu } from "@/components/shared/theme-menu";
 import { Logo } from "@/components/shared/logo";
 import { ICON_SIZES } from "@/lib/icons";
 

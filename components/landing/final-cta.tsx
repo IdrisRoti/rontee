@@ -1,86 +1,28 @@
-"use client";
+import { FadeIn, MaskReveal } from "@/components/shared/kinetic";
+import { QuickCapture } from "./quick-capture";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import { Pen } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/shared/motion";
-
-/**
- * Closing CTA — quick-create panel. Hands the typed text to the
- * guest create-reminder flow as `?q=` so step 1 starts prefilled.
- */
+/** Dark closing act: one last, very easy way in. */
 export function FinalCta() {
-  const [value, setValue] = React.useState("");
-  const router = useRouter();
-
   return (
-    <section
-      id="cta"
-      aria-labelledby="cta-heading"
-      className="mx-auto w-full max-w-md overflow-x-clip px-4 pb-16 sm:max-w-[1280px] sm:px-8 sm:pb-28"
-    >
-      <Reveal>
-        <div className="rounded-3xl bg-surface-subtle px-5 py-10 text-center transition-colors sm:mx-auto sm:max-w-4xl sm:px-12 sm:py-20">
-          <h2
-            id="cta-heading"
-            className="text-2xl leading-snug font-extrabold tracking-[-0.035em] text-foreground sm:text-[44px] sm:leading-tight"
-          >
-            Some things are too important to forget.
-          </h2>
-          <p className="mt-2 text-xs font-normal text-muted sm:mx-auto sm:mt-3 sm:max-w-xl sm:text-lg">
-            Create your first reminder in seconds. No setup fatigue, no
-            intrusive notifications.
+    <section aria-labelledby="final-cta-heading" className="relative px-4 pt-28 pb-20 sm:px-8 sm:pt-40 sm:pb-28">
+      <div className="mx-auto flex max-w-[880px] flex-col items-center text-center">
+        <FadeIn>
+          <span className="type-eyebrow inline-flex items-center gap-2 text-muted">
+            <span className="size-1.5 rounded-full bg-ember" /> About ten seconds
+          </span>
+        </FadeIn>
+        <h2 id="final-cta-heading" className="type-display mt-6">
+          <MaskReveal lines={[[{ text: "Tell Rontee" }, { text: "once.", className: "type-serif" }]]} />
+        </h2>
+        <FadeIn delay={0.2}>
+          <p className="type-body-lg mx-auto mt-6 max-w-md text-muted">
+            Your first reminder doesn’t need an account. Write it down, pick a date, and let it go.
           </p>
-
-          <form
-            className="mx-auto mt-6 flex max-w-xl flex-col gap-2.5 sm:mt-8"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const query = value.trim();
-              router.push(
-                query
-                  ? `/reminders/new?q=${encodeURIComponent(query)}`
-                  : "/reminders/new",
-              );
-            }}
-          >
-            <div className="flex flex-col gap-2.5 sm:-skew-x-[4deg] sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:border sm:border-border sm:bg-surface sm:p-1.5 sm:px-3 sm:shadow-subtle sm:transition-all sm:focus-within:border-accent">
-              <div className="flex min-w-0 items-center rounded-2xl border border-border bg-surface px-3.5 py-1 shadow-subtle transition-colors focus-within:border-accent sm:flex-1 sm:skew-x-[4deg] sm:rounded-full sm:border-0 sm:bg-transparent sm:shadow-none sm:focus-within:border-0">
-                <Pen
-                  size={12}
-                  aria-hidden
-                  className="mr-2 shrink-0 text-muted"
-                />
-                <label htmlFor="cta-reminder-input" className="sr-only">
-                  What would you like Rontee to remember?
-                </label>
-                <input
-                  id="cta-reminder-input"
-                  type="text"
-                  required
-                  value={value}
-                  onChange={(event) => setValue(event.target.value)}
-                  placeholder="What would you like Rontee to remember?"
-                  autoComplete="off"
-                  className="w-full min-w-0 border-0 bg-transparent py-2.5 text-xs font-medium text-foreground outline-none placeholder:text-muted sm:py-3 sm:text-sm"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full rounded-full py-3.5 text-sm sm:w-auto sm:shrink-0 sm:skew-x-[4deg] sm:px-6 sm:py-3"
-              >
-                Create a reminder
-              </Button>
-            </div>
-          </form>
-
-          <p className="mt-4 text-[11px] font-medium tracking-tight text-muted sm:mt-5 sm:text-xs">
-            No credit card required · Free to start · Takes 30 seconds
-          </p>
-        </div>
-      </Reveal>
+        </FadeIn>
+        <FadeIn delay={0.3} className="mt-10 w-full max-w-[560px] text-left">
+          <QuickCapture id="final-capture" />
+        </FadeIn>
+      </div>
     </section>
   );
 }

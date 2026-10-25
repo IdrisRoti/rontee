@@ -2,217 +2,195 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
-import { Contrast, Menu, Moon, Sun, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { useLenis } from "lenis/react";
 
 import { Button } from "@/components/ui/button";
 import { LogoLink } from "@/components/shared/logo";
-import { ICON_SIZES } from "@/lib/icons";
+import { ThemeMenu } from "@/components/shared/theme-menu";
+import { EASE, SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
-  { label: "What to remember", href: "#what-to-remember" },
-  { label: "Log in", href: "/login" },
+  { label: "Use cases", href: "#use-cases" },
+  { label: "FAQ", href: "#faq" },
 ] as const;
 
-type ThemeChoice = "light" | "system" | "dark";
-
-const THEME_OPTIONS: ReadonlyArray<{
-  value: ThemeChoice;
-  label: string;
-  Icon: typeof Sun;
-}> = [
-  { value: "light", label: "Light", Icon: Sun },
-  { value: "system", label: "System", Icon: Contrast },
-  { value: "dark", label: "Dark", Icon: Moon },
-];
-
-/**
- * Theme dropdown from the canonical landing spec:
- * Light / System / Dark, closes on outside click or Escape.
- */
-export function ThemeMenu() {
-  const { theme, setTheme } = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const mounted = React.useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const rootRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open ]);
-
-  const resolved: ThemeChoice =
-    theme === "light" || theme === "dark" || theme === "system"
-      ? theme
-      : "system";
-  // Gate on mounted so the first client render matches the server HTML.
-  // next-themes resolves the real theme after mount; reading it during
-  // hydration produces an aria-checked mismatch.
-  const current: ThemeChoice = mounted ? resolved : "system";
-  const ActiveIcon =
-    !mounted || current === "system"
-      ? Contrast
-      : current === "dark"
-        ? Moon
-        : Sun;
-
+/** Two bars that morph into an X. */
+function MenuIcon({ open }: { open: boolean }) {
   return (
-    <div ref={rootRef} className="relative">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        aria-label="Theme appearance"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="rounded-full"
-      >
-        <ActiveIcon size={ICON_SIZES.prominent} aria-hidden />
-      </Button>
-      <div
-        role="menu"
-        aria-label="Theme"
-        className={cn(
-          "absolute right-0 z-50 mt-2 w-36 rounded-xl border border-border bg-surface py-1.5 shadow-elevated",
-          open ? "block" : "hidden",
-        )}
-      >
-        {THEME_OPTIONS.map(({ value, label, Icon }) => (
-          <button
-            key={value}
-            role="menuitemradio"
-            aria-checked={current === value}
-            type="button"
-            onClick={() => {
-              setTheme(value);
-              setOpen(false);
-            }}
-            className={cn(
-              "flex w-full items-center gap-2.5 px-3.5 py-2 text-left text-sm transition-colors hover:bg-surface-subtle hover:text-foreground",
-              current === value ? "font-semibold text-foreground" : "text-muted",
-            )}
-          >
-            <Icon size={17} aria-hidden />
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <span aria-hidden className="relative block h-3 w-[18px]">
+      <motion.span
+        className="absolute left-0 h-[1.5px] w-full rounded-full bg-current"
+        animate={open ? { top: "50%", rotate: 45, y: "-50%" } : { top: "0%", rotate: 0, y: "0%" }}
+        transition={SPRING.snappy}
+      />
+      <motion.span
+        className="absolute left-0 h-[1.5px] w-full rounded-full bg-current"
+        animate={open ? { top: "50%", rotate: -45, y: "-50%" } : { top: "100%", rotate: 0, y: "-100%" }}
+        transition={SPRING.snappy}
+      />
+    </span>
   );
 }
 
 /**
- * Landing navbar from the canonical final Stitch design.
- * Desktop: links + theme dropdown + inline CTA.
- * Mobile (per Mobile Light spec): compact bar + hamburger menu panel.
- * No auth UI — "Log in" is an anchor placeholder until auth is built.
+ * Marketing navbar. Transparent at the top; condenses into a floating
+ * capsule on scroll; hides on scroll-down, returns on scroll-up.
+ * Mobile: full-screen sheet with large staggered links.
  */
 export function Navbar() {
+  const { scrollY } = useScroll();
+  const [condensed, setCondensed] = React.useState(false);
+  const [hidden, setHidden] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [hovered, setHovered] = React.useState<string | null>(null);
+  const lenis = useLenis();
+
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setCondensed(y > 24);
+    setHidden(y > 640 && y > prev + 2 && !open);
+    if (y < prev - 2) setHidden(false);
+  });
+
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.documentElement.style.overflow = "hidden";
+    lenis?.stop();
+    return () => {
+      lenis?.start();
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = "";
+    };
+  }, [open, lenis]);
 
   return (
-    <motion.header
-      initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/90 backdrop-blur-md"
-    >
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4 md:h-20 md:px-8 lg:px-10">
-        <LogoLink />
-
-        <div className="flex items-center gap-2 md:gap-7 lg:gap-8">
-          <nav
-            aria-label="Primary"
-            className="hidden items-center gap-8 text-[15px] font-medium text-muted md:flex"
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <ThemeMenu />
-
-          <Button
-            asChild
-            className="hidden rounded-full px-5 sm:px-6 md:inline-flex"
-          >
-            <Link href="/reminders/new">Create a reminder</Link>
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-            className="rounded-full md:hidden"
-          >
-            {open ? (
-              <X size={24} aria-hidden />
-            ) : (
-              <Menu size={24} aria-hidden />
-            )}
-          </Button>
-        </div>
-      </div>
-
-      <div
-        className={cn(
-          "border-t border-border bg-background md:hidden",
-          open ? "block" : "hidden",
-        )}
+    <>
+      <motion.header
+        initial={{ y: -24, opacity: 0 }}
+        animate={{ y: hidden ? -110 : 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: EASE.outExpo }}
+        className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:px-4 sm:pt-4"
       >
-        <div className="flex flex-col gap-4 px-5 py-6">
-          <nav
-            aria-label="Mobile"
-            className="flex flex-col gap-3.5 text-base font-medium text-muted"
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="py-1 transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+        <motion.div
+          layout
+          transition={SPRING.soft}
+          className={cn(
+            "flex w-full items-center justify-between gap-3 rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500",
+            condensed
+              ? "max-w-[880px] border-border bg-surface/80 py-1.5 pr-1.5 pl-4 shadow-elevated backdrop-blur-xl backdrop-saturate-150"
+              : "max-w-[1320px] border-transparent bg-transparent py-2 pr-2 pl-2 sm:pl-4",
+          )}
+        >
+          <LogoLink />
+
+          <nav aria-label="Primary" className="hidden md:block" onPointerLeave={() => setHovered(null)}>
+            <ul className="flex items-center">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onPointerEnter={() => setHovered(link.href)}
+                    onFocus={() => setHovered(link.href)}
+                    className="relative block px-4 py-2 text-sm text-muted transition-colors duration-200 hover:text-foreground"
+                  >
+                    {hovered === link.href && (
+                      <motion.span
+                        layoutId="nav-hover"
+                        transition={SPRING.snappy}
+                        className="absolute inset-0 -z-10 rounded-full bg-surface-subtle"
+                      />
+                    )}
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
-          <Button asChild className="w-full rounded-full py-3">
-            <Link href="/reminders/new" onClick={() => setOpen(false)}>
-              Create a reminder
-            </Link>
-          </Button>
-        </div>
-      </div>
-    </motion.header>
+
+          <div className="flex items-center gap-1">
+            <ThemeMenu className="hidden sm:block" />
+            <Button asChild variant="ghost" size="sm" className="hidden h-9 md:inline-flex">
+              <Link href="/login">Log in</Link>
+            </Button>
+            <Button asChild size="sm" className="h-9 px-4">
+              <Link href="/reminders/new">
+                <span className="hidden sm:inline">Create a reminder</span>
+                <span className="sm:hidden">Create</span>
+              </Link>
+            </Button>
+            <button
+              type="button"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              aria-controls="mobile-menu"
+              onClick={() => setOpen((v) => !v)}
+              className="relative z-[60] flex size-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-surface-subtle md:hidden"
+            >
+              <MenuIcon open={open} />
+            </button>
+          </div>
+        </motion.div>
+      </motion.header>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            initial={{ clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={{ clipPath: "inset(0 0 100% 0)" }}
+            transition={{ duration: 0.7, ease: EASE.inOutQuart }}
+            className="fixed inset-0 z-40 flex flex-col bg-background px-5 pt-28 pb-8 md:hidden"
+          >
+            <nav aria-label="Mobile" className="flex-1">
+              <ul className="flex flex-col">
+                {[...NAV_LINKS, { label: "Log in", href: "/login" }].map((link, i) => (
+                  <li key={link.href} className="overflow-hidden border-b border-border">
+                    <motion.div
+                      initial={{ y: "100%" }}
+                      animate={{ y: "0%" }}
+                      exit={{ y: "100%" }}
+                      transition={{ duration: 0.7, ease: EASE.outExpo, delay: 0.15 + i * 0.06 }}
+                    >
+                      <Link
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className="flex items-center justify-between py-5 text-[2rem] leading-none font-medium tracking-[-0.04em]"
+                      >
+                        {link.label}
+                        <ArrowUpRight size={22} aria-hidden className="text-faint" />
+                      </Link>
+                    </motion.div>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: EASE.outExpo, delay: 0.4 }}
+              className="flex items-center gap-3"
+            >
+              <Button asChild size="lg" className="flex-1">
+                <Link href="/reminders/new" onClick={() => setOpen(false)}>
+                  Create a reminder
+                </Link>
+              </Button>
+              <ThemeMenu placement="top" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

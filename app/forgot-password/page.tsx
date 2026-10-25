@@ -6,6 +6,8 @@ import { ForgotForm } from "@/components/auth/forgot-form";
 export const metadata: Metadata = {
   title: "Forgot password",
   description: "Reset your Rontee password via email.",
+  alternates: { canonical: "/forgot-password" },
+  robots: { index: false, follow: true },
 };
 
 /** Standalone forgot-password from Stitch. Frontend preview until auth lands. */
