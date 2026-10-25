@@ -17,10 +17,10 @@ const EXAMPLES = [
 ] as const;
 
 const SUGGESTIONS = [
-  { label: "Birthday", value: "Mum’s birthday on May 12" },
-  { label: "Renewal", value: "Passport renewal" },
-  { label: "Free trial", value: "Netflix trial ends Friday" },
-  { label: "Bill", value: "Rent due on the 28th" },
+  { label: "A birthday", value: "Mum’s birthday on May 12", color: "bg-blush" },
+  { label: "A renewal", value: "Passport renewal", color: "bg-sky" },
+  { label: "A free trial", value: "Netflix trial ends Friday", color: "bg-sage" },
+  { label: "A deadline", value: "Uni application due Friday", color: "bg-butter" },
 ] as const;
 
 /** Types and deletes example reminders while the field is empty. */
@@ -136,7 +136,7 @@ export function QuickCapture({
 
       {showSuggestions && (
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="type-eyebrow mr-1 text-faint">Try</span>
+          <span className="mr-0.5 text-sm text-muted">Or try</span>
           {SUGGESTIONS.map((s) => (
             <button
               key={s.label}
@@ -145,8 +145,9 @@ export function QuickCapture({
                 setValue(s.value);
                 inputRef.current?.focus();
               }}
-              className="rounded-full border border-border bg-surface/70 px-3 py-1.5 text-[13px] text-muted transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:text-foreground active:translate-y-0"
+              className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-foreground shadow-subtle transition-all duration-200 hover:-translate-y-0.5 hover:-rotate-1 hover:border-border-strong active:translate-y-0"
             >
+              <span aria-hidden className={cn("size-2 rounded-full", s.color)} />
               {s.label}
             </button>
           ))}

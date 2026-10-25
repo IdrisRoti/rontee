@@ -223,28 +223,35 @@ export function SpotlightCard({
 }
 
 /* ------------------------------------------------------------------ */
-/* Eyebrow — "001 • HOW IT WORKS" mono label.                           */
+/* Eyebrow — small friendly pill with a coloured dot.                   */
 /* ------------------------------------------------------------------ */
 
+const DOTS = {
+  ember: "bg-ember",
+  butter: "bg-butter",
+  sage: "bg-sage",
+  sky: "bg-sky",
+  blush: "bg-blush",
+} as const;
+
 export function Eyebrow({
-  index,
+  dot = "ember",
   children,
   className,
 }: {
-  index?: string;
+  dot?: keyof typeof DOTS;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        "type-eyebrow inline-flex w-fit items-center gap-2 self-start rounded-full border border-border bg-surface/60 px-2.5 py-1.5 text-muted",
+        "type-eyebrow inline-flex w-fit items-center gap-2 self-start rounded-full border border-border bg-surface px-3 py-2 text-foreground shadow-subtle",
         className,
       )}
     >
-      {index && <span className="text-faint">{index}</span>}
-      <span aria-hidden className="size-1 rounded-full bg-foreground" />
-      <span className="text-foreground">{children}</span>
+      <span aria-hidden className={cn("size-2 rounded-full", DOTS[dot])} />
+      {children}
     </span>
   );
 }

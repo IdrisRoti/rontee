@@ -6,11 +6,8 @@ import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { Manifesto } from "@/components/landing/manifesto";
-import { Marquee } from "@/components/landing/marquee";
 import { Navbar } from "@/components/landing/navbar";
-import { Unburden } from "@/components/landing/unburden";
-import { UseCases } from "@/components/landing/use-cases";
+import { RememberWall } from "@/components/landing/remember-wall";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
 import { site } from "@/lib/site";
 
@@ -59,8 +56,8 @@ const jsonLd = {
 };
 
 /**
- * Landing: light editorial page with two dark cinematic acts
- * (Unburden, closing CTA + footer). Lenis smooth scroll is scoped here.
+ * Landing: warm, simple, five sections. Paper reminders instead of tech
+ * visuals; one friendly product moment. Lenis smooth scroll is scoped here.
  */
 export default function Home() {
   return (
@@ -72,17 +69,12 @@ export default function Home() {
       <Navbar />
       <main className="block w-full">
         <Hero />
-        <Marquee />
-        <Manifesto />
         <HowItWorks />
-        <Unburden />
-        <UseCases />
+        <RememberWall />
         <Faq />
-      </main>
-      <div className="scheme-dark grain relative">
         <FinalCta />
-        <Footer />
-      </div>
+      </main>
+      <Footer />
     </SmoothScroll>
   );
 }

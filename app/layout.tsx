@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Bricolage_Grotesque, Caveat, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 import { MotionProvider } from "@/components/providers/motion-provider";
@@ -7,14 +7,17 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Variable font with optical sizing: warm and characterful at display sizes, calm at body sizes.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
+  axes: ["opsz"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Handwriting for paper notes only.
+const caveat = Caveat({
+  variable: "--font-caveat",
   subsets: ["latin"],
   display: "swap",
 });
@@ -61,8 +64,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f4f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0b0a" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f2e8" },
+    { media: "(prefers-color-scheme: dark)", color: "#27231e" },
   ],
   colorScheme: "light dark",
 };
@@ -76,7 +79,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(geistSans.variable, geistMono.variable, instrumentSerif.variable, "h-full")}
+      className={cn(bricolage.variable, caveat.variable, instrumentSerif.variable, "h-full")}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground antialiased">
         <ThemeProvider>

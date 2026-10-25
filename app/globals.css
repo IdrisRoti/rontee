@@ -3,30 +3,35 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------- */
-/* Rontee design tokens — monochrome + one tiny warm accent (ember)  */
-/* Light is default on :root, dark on .dark (next-themes class).     */
-/* `.scheme-dark` forces dark tokens on a subtree (cinematic          */
-/* sections) regardless of the global theme.                         */
+/* Rontee design tokens — warm paper, soft ink, five friendly        */
+/* pastels. Light is default on :root, dark on .dark (next-themes).  */
 /* ---------------------------------------------------------------- */
 
 :root {
-  --background: #f5f4f0;
-  --surface: #ffffff;
-  --surface-subtle: #edece7;
-  --surface-elevated: #ffffff;
-  --foreground: #0f0f0e;
-  --muted: #67665f;
-  --faint: #a3a19a;
-  --border: #e3e1db;
-  --border-strong: #d1cfc8;
+  --background: #f7f2e8;
+  --surface: #fffdf8;
+  --surface-subtle: #efe8da;
+  --surface-elevated: #fffdf8;
+  --foreground: #1e1b16;
+  --muted: #6b6358;
+  --faint: #a69d8f;
+  --border: #e6ddcc;
+  --border-strong: #d6cbb6;
 
-  --primary: #0f0f0e;
-  --primary-foreground: #fafaf7;
+  --primary: #1e1b16;
+  --primary-foreground: #fffdf8;
 
-  /* Warm accent: urgency, notification dots, one highlight per view. Never a fill for large areas. */
-  --ember: #e8572a;
+  /* Tomato: little dots, urgency, "today". Never a large fill. */
+  --ember: #e8573a;
   --ember-foreground: #ffffff;
-  --ember-subtle: #fbe8df;
+  --ember-subtle: #fbe3da;
+
+  /* Friendly pastels — paper notes and categories. Text on them is always --ink. */
+  --butter: #f6d86b;
+  --sage: #a8c3a0;
+  --sky: #a9c9e8;
+  --blush: #f2b8b0;
+  --ink: #1e1b16;
 
   /* Legacy aliases — older screens used `accent` for teal. Now neutral ink. */
   --accent: var(--primary);
@@ -36,7 +41,7 @@
 
   --destructive: #c4321c;
   --destructive-foreground: #ffffff;
-  --ring: #0f0f0e;
+  --ring: #1e1b16;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -44,52 +49,50 @@
   --radius-xl: 24px;
   --radius-2xl: 32px;
 
-  --shadow-subtle: 0 1px 2px rgb(15 15 14 / 0.05);
-  --shadow-elevated: 0 1px 1px rgb(15 15 14 / 0.03), 0 12px 32px -12px rgb(15 15 14 / 0.12);
-  --shadow-float: 0 1px 1px rgb(15 15 14 / 0.04), 0 24px 60px -20px rgb(15 15 14 / 0.22);
+  --shadow-subtle: 0 1px 2px rgb(60 45 20 / 0.06);
+  --shadow-elevated: 0 1px 1px rgb(60 45 20 / 0.04), 0 12px 30px -12px rgb(60 45 20 / 0.16);
+  --shadow-float: 0 2px 2px rgb(60 45 20 / 0.04), 0 22px 50px -18px rgb(60 45 20 / 0.28);
+  /* Paper: short contact shadow + soft lift */
+  --shadow-paper: 0 1px 1px rgb(60 45 20 / 0.08), 0 8px 18px -8px rgb(60 45 20 / 0.25);
 
   color-scheme: light;
 }
 
-.dark,
-.scheme-dark {
-  --background: #0b0b0a;
-  --surface: #141413;
-  --surface-subtle: #1b1b19;
-  --surface-elevated: #1f1f1d;
-  --foreground: #edebe5;
-  --muted: #96948d;
-  --faint: #5c5b56;
-  --border: #262624;
-  --border-strong: #363531;
+.dark {
+  /* Warm 'evening' mode: lamp-lit charcoal, not black. */
+  --background: #27231e;
+  --surface: #302b25;
+  --surface-subtle: #3a342d;
+  --surface-elevated: #3b352e;
+  --foreground: #f5efe4;
+  --muted: #bdb3a4;
+  --faint: #857b6d;
+  --border: #423b33;
+  --border-strong: #554c41;
 
-  --primary: #edebe5;
-  --primary-foreground: #0b0b0a;
+  --primary: #f5efe4;
+  --primary-foreground: #27231e;
 
-  --ember: #ff6a3d;
-  --ember-foreground: #140804;
-  --ember-subtle: #2b1810;
+  --ember: #f2735a;
+  --ember-foreground: #1f0c06;
+  --ember-subtle: #4a2c22;
 
-  --destructive: #f07a66;
+  /* Slightly softened so paper doesn't glare in the evening */
+  --butter: #e6ca62;
+  --sage: #9ab493;
+  --sky: #9dbcd9;
+  --blush: #e2aaa2;
+
+  --destructive: #f2836f;
   --destructive-foreground: #2b0505;
-  --ring: #edebe5;
+  --ring: #f5efe4;
 
-  --shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-elevated: 0 1px 1px rgb(0 0 0 / 0.3), 0 16px 36px -12px rgb(0 0 0 / 0.6);
-  --shadow-float: 0 1px 1px rgb(0 0 0 / 0.3), 0 30px 70px -20px rgb(0 0 0 / 0.75);
+  --shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.25);
+  --shadow-elevated: 0 1px 1px rgb(0 0 0 / 0.2), 0 14px 32px -12px rgb(0 0 0 / 0.45);
+  --shadow-float: 0 1px 1px rgb(0 0 0 / 0.2), 0 24px 50px -18px rgb(0 0 0 / 0.55);
+  --shadow-paper: 0 1px 1px rgb(0 0 0 / 0.25), 0 10px 20px -8px rgb(0 0 0 / 0.45);
 
   color-scheme: dark;
-}
-
-/* Cinematic sections read slightly deeper than the page in dark mode. */
-.dark .scheme-dark {
-  --background: #070706;
-  --surface: #111110;
-}
-
-.scheme-dark {
-  background-color: var(--background);
-  color: var(--foreground);
 }
 
 @theme inline {
@@ -107,6 +110,11 @@
   --color-ember: var(--ember);
   --color-ember-foreground: var(--ember-foreground);
   --color-ember-subtle: var(--ember-subtle);
+  --color-butter: var(--butter);
+  --color-sage: var(--sage);
+  --color-sky: var(--sky);
+  --color-blush: var(--blush);
+  --color-ink: var(--ink);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-subtle: var(--accent-subtle);
@@ -115,9 +123,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-hand: var(--font-caveat), "Segoe Print", "Bradley Hand", cursive;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -128,6 +137,7 @@
   --shadow-subtle: var(--shadow-subtle);
   --shadow-elevated: var(--shadow-elevated);
   --shadow-float: var(--shadow-float);
+  --shadow-paper: var(--shadow-paper);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -150,7 +160,7 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv11";
+    font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -177,34 +187,34 @@
 }
 
 /* ---------------------------------------------------------------- */
-/* Typography — Geist (UI/headlines), Instrument Serif (accent       */
-/* words, italic), Geist Mono (eyebrows, dates, counters).           */
+/* Typography — Bricolage Grotesque (UI + headlines, optical sizes), */
+/* Instrument Serif italic (accent words), Caveat (handwritten notes) */
 /* ---------------------------------------------------------------- */
 
 @layer components {
   .type-display {
-    font-weight: 500;
-    letter-spacing: -0.045em;
+    font-weight: 600;
+    letter-spacing: -0.04em;
     line-height: 0.98;
-    font-size: clamp(2.75rem, 7.2vw + 0.5rem, 6.75rem);
+    font-size: clamp(2.75rem, 6.4vw + 0.6rem, 6.25rem);
   }
   .type-h1 {
-    font-weight: 500;
-    letter-spacing: -0.04em;
+    font-weight: 600;
+    letter-spacing: -0.035em;
     line-height: 1.04;
-    font-size: clamp(2.25rem, 4.2vw + 0.75rem, 4.5rem);
+    font-size: clamp(2.125rem, 3.6vw + 0.8rem, 4rem);
   }
   .type-h2 {
-    font-weight: 500;
-    letter-spacing: -0.035em;
-    line-height: 1.08;
-    font-size: clamp(1.75rem, 2.4vw + 0.9rem, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    font-size: clamp(1.75rem, 2.2vw + 0.9rem, 2.75rem);
   }
   .type-h3 {
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.25;
-    font-size: clamp(1.125rem, 0.6vw + 1rem, 1.5rem);
+    font-size: clamp(1.125rem, 0.5vw + 1rem, 1.375rem);
   }
   .type-body {
     font-weight: 400;
@@ -214,8 +224,8 @@
   .type-body-lg {
     font-weight: 400;
     line-height: 1.55;
-    letter-spacing: -0.01em;
-    font-size: clamp(1rem, 0.4vw + 0.9rem, 1.1875rem);
+    letter-spacing: -0.005em;
+    font-size: clamp(1.0625rem, 0.4vw + 0.95rem, 1.25rem);
   }
   .type-body-small {
     font-weight: 400;
@@ -232,23 +242,27 @@
     font-weight: 500;
     line-height: 1.4;
     font-size: 0.8125rem;
+  }
+  /* Small friendly label above a heading */
+  .type-eyebrow {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    line-height: 1;
     letter-spacing: -0.005em;
   }
-  /* Mono eyebrow: "004 • PROCESS" */
-  .type-eyebrow {
-    font-family: var(--font-mono);
-    font-weight: 500;
-    font-size: 0.6875rem;
-    line-height: 1;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  /* Serif italic accent word inside a Geist headline */
+  /* Serif italic accent word inside a headline */
   .type-serif {
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 400;
     letter-spacing: -0.02em;
+  }
+  /* Handwriting on paper notes */
+  .type-hand {
+    font-family: var(--font-hand);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: 0;
   }
 }
 

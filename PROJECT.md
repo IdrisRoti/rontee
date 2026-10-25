@@ -17,65 +17,81 @@ Product rules (from `docs/product-plan/*.pdf`, gitignored — still binding):
 - **Dashboard answers "What do I need to remember?"** — no KPI cards/analytics.
 - Free + Pro planned (5 active reminders proposed for Free); upgrade prompts contextual + dismissible. Plan & Billing lives under Settings/account menu, not primary nav.
 - Primary app nav: Dashboard, Reminders, Calendar, Settings.
+- Categories: Personal, Financial, Documents, Work/Education (+ custom).
 
-## Design ownership & direction (since 2026-10-25)
+## Design ownership & direction
 
-Claude owns the design. The old Stitch screens and the **visual** parts of the PDF
-design brief (teal, Manrope, "no glass / no parallax / subtle motion only") are
-**overridden**. Visual reference: `docs/product-design-inspo/` (26 images, gitignored — never put them back in `public/`).
-Motion references: sooft.work, useaccrue.com, bdsn.club, eszterbial.com, apple.com,
-unseen.co, lusion.co.
+Claude owns the design (since 2026-10-25). The old Stitch screens and the **visual**
+parts of the PDF brief (teal, Manrope) are overridden. `docs/product-design-inspo/`
+(26 images, gitignored — never put them back in `public/`) was the first reference,
+but most of it is AI/SaaS sites — **don't drift back to that look**.
 
-Principles: visually rich + simple to use ("simple" ≠ empty). Editorial type,
-monochrome surfaces, textured generative visuals (dot-matrix, halftone, particles,
-grain), live UI previews instead of illustrations, advanced but purposeful motion.
-
-**Theme strategy (option C):** Light is the default everywhere. The landing page
-alternates in **dark cinematic sections** (`.scheme-dark`) for drama. The app is
-light by default; Dark and System are fully designed options (ThemeMenu).
+**Current direction (2026-10-25, v2 — user feedback "too SaaS"):**
+**Friendly, warm, simple, personal.** It should feel like a kind friend with a good
+memory, not a productivity tool.
+- Warm cream paper + soft ink, **five pastels** that each mean a category, tomato for "today/urgent".
+- **Paper objects instead of tech visuals**: sticky notes, tear-off calendar, handwritten notes, doodles. Interactive (drag, tear, wiggle), playful springs.
+- **Show people's moments, not software.** At most *one* small product moment per section (e.g. a friendly notification).
+- **Fewer sections, less going on.** No dark cinematic sections, no scroll-jacking/pinning, no WebGL/particles, no mono "001 • LABEL" eyebrows, no bento of UI mocks.
+- **Friendly copy**: plain words, warm, a bit of humour ("That free trial you'll *definitely* forget to cancel"). Avoid product-speak ("use cases", "handled", "seamless").
+- Theme: light by default everywhere; Dark and System are designed options (ThemeMenu). Dark = warm, lamp-lit "evening" charcoal (not near-black — user found the first dark too dark); pastels slightly softened; white paper tinted cream (`dark:bg-[#ece3d2]`).
 
 ## Design system
 
 ### Color (tokens in `app/globals.css`; mirror in `lib/design-tokens.ts`)
-Monochrome + **one tiny warm accent ("ember")**. Ember is for urgency, notification
-dots, one highlight per view — never large fills.
 
 | Token | Light | Dark |
 |---|---|---|
-| background | `#F5F4F0` (warm paper) | `#0B0B0A` |
-| surface | `#FFFFFF` | `#141413` |
-| surface-subtle | `#EDECE7` | `#1B1B19` |
-| foreground | `#0F0F0E` | `#EDEBE5` |
-| muted | `#67665F` | `#96948D` |
-| faint (decorative/placeholder only) | `#A3A19A` | `#5C5B56` |
-| border / border-strong | `#E3E1DB` / `#D1CFC8` | `#262624` / `#363531` |
-| primary (buttons) | ink `#0F0F0E` | bone `#EDEBE5` |
-| ember / ember-subtle | `#E8572A` / `#FBE8DF` | `#FF6A3D` / `#2B1810` |
+| background (cream paper) | `#F7F2E8` | `#27231E` (warm evening) |
+| surface | `#FFFDF8` | `#302B25` |
+| surface-subtle | `#EFE8DA` | `#3A342D` |
+| foreground / ink | `#1E1B16` | `#F5EFE4` |
+| muted | `#6B6358` | `#BDB3A4` |
+| faint (decorative/placeholder only) | `#A69D8F` | `#857B6D` |
+| border / border-strong | `#E6DDCC` / `#D6CBB6` | `#423B33` / `#554C41` |
+| primary (buttons) | ink `#1E1B16` | `#F5EFE4` |
+| ember (tomato) / ember-subtle | `#E8573A` / `#FBE3DA` | `#F2735A` / `#4A2C22` |
+| butter / sage / sky / blush | `#F6D86B` / `#A8C3A0` / `#A9C9E8` / `#F2B8B0` | `#E6CA62` / `#9AB493` / `#9DBCD9` / `#E2AAA2` |
 
-- `.scheme-dark` forces dark tokens on a subtree regardless of theme (cinematic sections). Inside it, avoid `dark:` variants — use tokens.
-- **Legacy alias:** `accent*` tokens now map to neutral ink (were teal) so un-redesigned screens are neutral. New code uses `primary` / `ember`, never `accent`.
-- Shadows: `shadow-subtle`, `shadow-elevated`, `shadow-float`. Radii 8/12/16/24/32; cards ~28px, buttons pill (`rounded-full`).
+- **Colour = category** (`lib/categories.ts`): Personal → blush, Financial → sage, Documents → sky, Work & study → butter. Use the same mapping on every screen (notes, chips, dots, lists).
+- Text on a pastel is always `text-ink` (stays dark in both themes).
+- Tomato (`ember`) = small dots, "today", urgency, squiggles. Never a large fill.
+- **Legacy alias:** `accent*` tokens map to neutral ink (were teal). New code uses `primary` / `ember` / pastels, never `accent`.
+- Shadows: `shadow-subtle`, `shadow-elevated`, `shadow-float`, **`shadow-paper`** (paper objects). Radii 8/12/16/24/32; cards ~28px, big panels 36px, buttons pill.
 
 ### Typography (next/font in `app/layout.tsx`)
-- **Geist Sans** — UI + headlines (`font-sans`). Headlines weight 500, tight tracking.
-- **Instrument Serif italic** — accent words only (`.type-serif`), e.g. "what *matters.*"
-- **Geist Mono** — eyebrows, dates, counters, step numbers (`font-mono`, `.type-eyebrow`).
-- Scale classes: `.type-display` (to 108px), `.type-h1`, `.type-h2`, `.type-h3`, `.type-body-lg`, `.type-body`, `.type-body-small`, `.type-caption`, `.type-label`, `.type-eyebrow`.
-- Pattern: two-tone headlines (faint line → ink line), mono eyebrow pill `001 • SECTION` (`<Eyebrow>`).
+- **Bricolage Grotesque** (variable, optical sizing) — UI + headlines (`font-sans`). Headlines weight 600, tight tracking. Warm and characterful at display sizes.
+- **Instrument Serif italic** — accent words only (`.type-serif`), e.g. "what *matters.*", "a *friend.*"
+- **Caveat** — handwriting on paper notes / annotations only (`font-hand`, `.type-hand`).
+- No mono font (system mono fallback only).
+- Scale: `.type-display`, `.type-h1`, `.type-h2`, `.type-h3`, `.type-body-lg`, `.type-body`, `.type-body-small`, `.type-caption`, `.type-label`, `.type-eyebrow` (small sans label).
+- Patterns: solid ink headline + one serif-italic phrase; tomato hand-drawn `<Squiggle>` under the key word; `<Eyebrow dot="sky">` pill with a pastel dot.
+
+### Paper toolkit (`components/landing/paper.tsx`)
+`PaperNote` (category colour, tape, folded corner), `Polaroid` (photo print + handwritten caption), `Draggable` (drop-in spring, drag within constraints on fine pointers only — touch keeps native scroll; tap = wiggle), `useFinePointer`, `TearOffCalendar` (auto/tap tears the sheet; real 2026 weekdays), `Squiggle`, `DoodleArrow`. Reuse these in the app (empty states, onboarding, confirmations).
 
 ### Motion (`lib/motion.ts`, `components/shared/kinetic.tsx`)
-- Eases: `EASE.outExpo` (entrances), `outQuart`, `inOutQuart` (sheets/wipes). Tailwind: `ease-out-expo` etc.
-- Springs: `SPRING.snappy` (controls, sliding highlights via `layoutId`), `soft` (panels/menus), `magnetic`.
-- Primitives: `MaskReveal` (word-by-word masked rise, supports serif segments), `FadeIn` (rise + blur-in), `Magnetic`, `SpotlightCard` (cursor light + border glint), `Eyebrow`.
-- Scroll: **Lenis** (`components/providers/smooth-scroll.tsx`, marketing pages only) driven by the GSAP ticker; **GSAP ScrollTrigger** for pinned/scrubbed scenes (`useGSAP` + `gsap.matchMedia`).
-- WebGL: raw **three.js** (no R3F). Helpers in `lib/webgl.ts` (theme-aware colors, simplex noise, renderer). Every canvas pauses offscreen/hidden tab and renders a static frame under reduced motion.
-- Everything respects `prefers-reduced-motion` (framer `MotionConfig reducedMotion="user"`, matchMedia branches, CSS kill-switch).
-- Legacy primitives in `components/shared/motion.tsx` (FadeUp, Stagger, Typewriter, Meter) are still used by old screens; prefer kinetic.tsx for new work.
+- Playful, physical, light: springs with a little overshoot for paper, expo-out for text.
+- Primitives: `MaskReveal` (word-by-word rise; supports serif segments + `lineClassName="text-balance"`), `FadeIn`, `Magnetic`, `SpotlightCard`, `Eyebrow`.
+- **Lenis** smooth scroll on marketing pages only (`components/providers/smooth-scroll.tsx`, autoRaf). No GSAP / three.js (removed).
+- Everything respects `prefers-reduced-motion`.
+- Legacy primitives in `components/shared/motion.tsx` (FadeUp, Stagger, Typewriter, Meter) are still used by old screens.
 
 ### Brand
-- Logo: `components/shared/logo.tsx` — **R mark** (ink rounded tile, lowercase "r" whose shoulder reaches for an **ember dot** = the thing remembered) + lowercase **"rontee"** wordmark set in Geist (real text).
+- Logo: `components/shared/logo.tsx` — **R mark** (ink rounded tile, lowercase "r" reaching for a **tomato dot** = the thing remembered) + lowercase **"rontee"** wordmark (real text, inherits Bricolage).
 - Favicon set: `app/icon.svg` (adapts to dark tab bars), `app/favicon.ico` (16/32/48, generated from the mark with sharp), `app/apple-icon.tsx` (180px).
-- Voice: calm, personal, friend-like. "Mum's birthday is in 7 days. Maybe order that scarf she liked?"
+- Voice: warm, plain, a little playful. "Mum's birthday is in 7 days 🎂 Maybe order that scarf she liked?"
+
+### Photos (`public/images/photos/`)
+CC0 photos from StockSnap (via the Openverse API, `license=cc0`), smart-cropped to 640×640 WebP. Shown only as polaroids. No attribution legally required; credits kept here:
+- `mum-hug.webp` — "Mother Daughter", Candace McDaniel — https://stocksnap.io/photo/mother-daughter-6BLG9YCQ2D
+- `birthday-cake.webp` — "Birthday Cake", Altered Reality — https://stocksnap.io/photo/birthday-cake-W7T1J6B7DM
+- `grandma.webp` — "Mother Generation", Candace McDaniel — https://stocksnap.io/photo/mother-generation-PEFKCYN1NY
+- `passport.webp` — "Passport Table", Kristin Hardwick — https://stocksnap.io/photo/passport-table-VZTYVVUYZB
+- `roses.webp` — "Flowers Bouquet", Kelly Ishmael — https://stocksnap.io/photo/flowers-bouquet-CNEX3ZDN3G
+- `mum-child.webp` — "Mother Child", Family First — https://stocksnap.io/photo/mother-child-HE2S42Y7QG
+
+New photos: warm, bright, real-life moments; avoid seasonal (Christmas) and dark/moody shots; CC0 only.
 
 ## SEO
 - Site constants: `lib/site.ts` (`NEXT_PUBLIC_SITE_URL` overrides `https://rontee.vercel.app`).
@@ -86,8 +102,8 @@ dots, one highlight per view — never large fills.
 
 ## Stack
 Next.js 16.3.6 (App Router, Turbopack) · React 19.2 · TS strict · Tailwind v4 (CSS-first `@theme`) ·
-shadcn-pattern UI + Radix · next-themes (class, default **light**) · framer-motion · **gsap + @gsap/react** ·
-**lenis** · **three** · lucide-react · date-fns.
+shadcn-pattern UI + Radix · next-themes (class, default **light**) · framer-motion · **lenis** ·
+lucide-react · date-fns.
 Still deliberately absent: backend, DB, auth backend, notifications, billing, TanStack Query, RHF/Zod, Zustand.
 
 Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
@@ -95,15 +111,17 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 ## Workflow
 - **One screen at a time.** Build Desktop Light → Dark → Mobile, verify, then get the user's approval before the next screen.
 - Verify: `npx tsc --noEmit` · `npm run lint` · `npm run build`; visually at 1440×900 and 390×844, light + dark, no horizontal overflow.
-- No browser extension here: screenshots via `puppeteer-core` driving system Edge (`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`, flags `--use-angle=swiftshader --enable-unsafe-swiftshader` for WebGL), installed in the session scratchpad, not the project. Scroll in small steps so ScrollTrigger scenes play.
+- No browser extension here: screenshots via `puppeteer-core` driving system Edge (`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`), installed in the session scratchpad, not the project. Launch with `--disable-gpu` (swiftshader leaves unpainted 256px tile bands in dark screenshots — a renderer artifact, not a page bug). Scroll in small steps so in-view animations play.
 - User usually has `next dev` running on :3000 — reuse it.
+- Files are CRLF on disk after git checkouts — scripted edits must handle `\r\n` (prefer the Edit/Write tools).
+- Commit only when asked; user is fine with work landing on `main` (previously merged via fast-forward).
 
 ## Screen status
 
 | # | Screen | Route | Status |
 |---|---|---|---|
-| 0 | Foundation (tokens, type, motion, logo, favicon, SEO) | — | ✅ Done 2026-10-25 |
-| 1 | Landing | `/` | 🟡 Built 2026-10-25 — awaiting user review |
+| 0 | Foundation (tokens, type, motion, logo, favicon, SEO) | — | ✅ v2 (friendly) 2026-10-25 |
+| 1 | Landing | `/` | 🟡 v2 friendly rebuild 2026-10-25 — awaiting user review |
 | 2 | Create reminder (3 steps) | `/reminders/new` | ⏳ Old design (neutralised by tokens) |
 | 3 | Reminder ready (guest / saved) | `/reminders/new` states | ⏳ Old design |
 | 4 | Auth: sign up, log in, forgot, reset | `/signup` `/login` `/forgot-password` `/reset-password` | ⏳ Old design |
@@ -115,31 +133,32 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 | 10 | Settings (profile, notifications, appearance, security) | `/settings/*` | ⬜ |
 | 11 | Plan & Billing | `/settings/billing` | ⬜ |
 
-### Landing composition (`app/page.tsx`)
-1. **Navbar** — transparent → floating capsule on scroll; hides on scroll-down; sliding hover pill; mobile full-screen clip-path sheet (pauses Lenis).
-2. **Hero** — two-tone display headline (serif "matters."), `QuickCapture` (typing placeholder, suggestion chips → `/reminders/new?q=`), **MemoryOrb** (three.js dot sphere, ember "memories", pointer repel, scatters on scroll), parallax floating reminder cards (lg+).
-3. **Marquee** — two counter-scrolling rows of real reminders; speed reacts to Lenis scroll velocity, slows on hover.
-4. **Manifesto** — scroll-scrubbed word-by-word brightening paragraph.
-5. **How it works** — pinned (lg+, +220%): scroll drives the live 3-step mock (typing, calendar pick, offset checks); steps clickable (Lenis scrollTo). Mobile: stacked cards animated in view.
-6. **Unburden** (dark) — pinned (+170%): particle "noise" + floating thoughts → orderly May 2026 calendar; lit cells = May 5 + 11 (nudges) and May 12 (Mum's birthday), matching How it works.
-7. **Use cases** — bento of live micro-UIs in SpotlightCards: year ring countdown, passport renewal timeline, trials list, fanning notification stack, recurring tracks.
-8. **FAQ** — numbered accordion (+ FAQPage JSON-LD).
-9. **Final CTA + Footer** (dark) — "Tell Rontee *once.*" + second QuickCapture; link columns; giant scroll-rising wordmark.
+### Landing composition (`app/page.tsx`) — v2
+1. **Navbar** — transparent → floating capsule on scroll; hides on scroll-down; sliding hover pill; mobile full-screen sheet (pauses Lenis). CTA "Start a reminder".
+2. **Hero** — "Never forget what *matters.*" with tomato squiggle; friendly copy; `QuickCapture` (typing placeholder, pastel suggestion chips → `/reminders/new?q=`); ticks (free, no sign-up, 10 seconds). Right: a board of draggable paper things — "Mum's birthday" polaroid + three category notes — around a `TearOffCalendar`; "psst… move us around" annotation (xl, fine pointer).
+3. **How it works** — "As easy as telling *a friend.*" Three cards with pastel art areas: note writes itself → 12th gets circled → friendly notification pops in (the one product moment).
+4. **What to remember** — "Big dates, little dates, and everything *in between.*" Category legend + wall of 12 items: 8 handwritten notes + 4 polaroids (cake, passport, roses, grandma) (colour = category), springy pop-in, hover straightens, draggable on desktop.
+5. **FAQ** — friendly accordion (+ FAQPage JSON-LD).
+6. **Final CTA** — butter-yellow panel "Go on, what don't *you want to forget?*" + QuickCapture; a polaroid + a note tucked in the corners (lg).
+7. **Footer** — simple, light, handwritten tagline, theme menu.
 
 ## Gotchas (keep)
-- **ScrollTrigger disables pin spacing when the pinned element's parent is flex.** Keep `<main>` as block and set `pinSpacing: true` explicitly.
 - SVG coordinates computed with trig must be rounded (server vs client `Math.cos` differ in last digits → hydration mismatch).
+- If you ever add GSAP pinning back: ScrollTrigger disables pin spacing when the pinned element's parent is flex — keep `<main>` block and set `pinSpacing: true`.
 - ThemeMenu reads next-themes only after mount (`useSyncExternalStore` mounted flag) to avoid hydration mismatch. Keep this pattern for any theme-dependent attributes.
-- `html`/`body` use `overflow-x: clip` (not hidden) so sticky/pins keep working.
+- framer `drag` + `touch-none` blocks page scroll on phones — only enable drag on fine pointers.
+- `html`/`body` use `overflow-x: clip` (not hidden).
 - Flex `truncate` children need `min-w-0 flex-1`.
 - If `tsc` fails only inside `.next/dev/types`, delete `.next` and re-run.
 - Wizard (old): draft held in localStorage `rontee:reminder-draft` across the signup detour; `?recovered=1` restores to saved; `?q=` prefills step 1. Step transitions scroll to top + focus `#wizard-heading`.
 
 ## Open items / to confirm with user
-- Landing copy claims to verify: "Free to start", Pro "on the way", FAQ answers (all consistent with the product plan, but marketing wording is new).
+- Landing copy claims to verify: "Free to start", Pro "on the way", FAQ answers.
 - Privacy / Terms pages don't exist (footer links are `#`).
 - `npm audit` shows pre-existing advisories in `next` (16.0–16.4, critical: 'use cache' leak), `sharp`, `source-map-js`, `zod` — not addressed yet; upgrading Next needs a deliberate pass.
 - Final production domain (update `NEXT_PUBLIC_SITE_URL`).
 
 ## Change log
-- **2026-10-25** — Redesign kickoff. Claude takes over design; teal/Manrope/Stitch dropped. Theme strategy C. Foundation: new tokens (monochrome + ember), Geist/Instrument Serif/Geist Mono, motion system (Lenis, GSAP, three.js), new R mark + wordmark, favicon set, full SEO (metadata, OG image, robots, sitemap, manifest, JSON-LD). Landing page rebuilt (9 sections above). Old landing sections (memory-stage, mental-relief, what-to-remember) removed. ThemeMenu moved to `components/shared/theme-menu.tsx`. This file supersedes the (gitignored) HANDOFF.md, which describes the old teal/Stitch system — don't follow it.
+- **2026-10-25** — Redesign kickoff. Claude takes over design; teal/Manrope/Stitch dropped. Foundation: tokens, motion system, new R mark + wordmark, favicon set, full SEO (metadata, OG image, robots, sitemap, manifest, JSON-LD). Landing v1 (monochrome, WebGL orb, pinned scenes, dark cinematic sections). ThemeMenu moved to `components/shared/theme-menu.tsx`. This file supersedes the (gitignored) HANDOFF.md — don't follow it. Committed + pushed to `main` (07bce10, ebe14c5). Private docs moved to `docs/` (gitignored).
+- **2026-10-25 (v2)** — User: v1 felt "SaaS-like", wanted friendlier, simpler, less chaotic, friendlier copy, more colour. New direction: warm cream + 5 category pastels + tomato; Bricolage Grotesque + Instrument Serif + Caveat (Geist/Geist Mono dropped); paper objects (sticky notes, tear-off calendar) replace WebGL/particles; landing cut to 5 sections; no dark sections, no pinning. Removed gsap, @gsap/react, three, @types/three, lib/webgl, marquee/manifesto/unburden/use-cases/visuals. Added `lib/categories.ts`, `components/landing/paper.tsx`, `remember-wall.tsx`.
+- **2026-10-25 (v2.1)** — Added 6 CC0 photos as polaroids (hero, wall, CTA); `Polaroid` component. Dark mode lightened to a warm evening charcoal (#27231E) at the user's request; cream-tinted paper in dark.

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
-  { label: "Use cases", href: "#use-cases" },
+  { label: "What to remember", href: "#remember" },
   { label: "FAQ", href: "#faq" },
 ] as const;
 
@@ -120,8 +120,8 @@ export function Navbar() {
             </Button>
             <Button asChild size="sm" className="h-9 px-4">
               <Link href="/reminders/new">
-                <span className="hidden sm:inline">Create a reminder</span>
-                <span className="sm:hidden">Create</span>
+                <span className="hidden sm:inline">Start a reminder</span>
+                <span className="sm:hidden">Start</span>
               </Link>
             </Button>
             <button
@@ -183,7 +183,7 @@ export function Navbar() {
             >
               <Button asChild size="lg" className="flex-1">
                 <Link href="/reminders/new" onClick={() => setOpen(false)}>
-                  Create a reminder
+                  Start a reminder
                 </Link>
               </Button>
               <ThemeMenu placement="top" />
