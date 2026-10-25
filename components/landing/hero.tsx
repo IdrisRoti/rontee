@@ -88,7 +88,7 @@ export function Hero() {
           </FadeIn>
 
           <FadeIn immediate delay={0.6} className="mt-9 max-w-[32rem]">
-            <QuickCapture />
+            <QuickCapture shared />
           </FadeIn>
 
           <FadeIn immediate delay={0.75}>

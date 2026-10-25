@@ -403,3 +403,103 @@ html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* ---------------------------------------------------------------- */
+/* View transitions (React <ViewTransition> + theme reveal)          */
+/* ---------------------------------------------------------------- */
+
+/* Clicks pass through to the live page while a transition runs. */
+::view-transition {
+  pointer-events: none;
+}
+
+/* Default page change: gentle blur-crossfade with a small rise. */
+::view-transition-old(.page-fade) {
+  animation: 220ms var(--ease-out-quart) both rontee-vt-fade-out;
+}
+::view-transition-new(.page-fade) {
+  animation: 520ms var(--ease-out-expo) 120ms both rontee-vt-fade-in;
+}
+
+/* Directional: forward slides left, back slides right. */
+::view-transition-old(.nav-forward) {
+  --vt-offset: -48px;
+  animation:
+    200ms var(--ease-out-quart) both rontee-vt-fade-out,
+    480ms var(--ease-in-out-quart) both rontee-vt-slide-out;
+}
+::view-transition-new(.nav-forward) {
+  --vt-offset: 48px;
+  animation:
+    360ms var(--ease-out-quart) 140ms both rontee-vt-fade-in,
+    560ms var(--ease-out-expo) both rontee-vt-slide-in;
+}
+::view-transition-old(.nav-back) {
+  --vt-offset: 48px;
+  animation:
+    200ms var(--ease-out-quart) both rontee-vt-fade-out,
+    480ms var(--ease-in-out-quart) both rontee-vt-slide-out;
+}
+::view-transition-new(.nav-back) {
+  --vt-offset: -48px;
+  animation:
+    360ms var(--ease-out-quart) 140ms both rontee-vt-fade-in,
+    560ms var(--ease-out-expo) both rontee-vt-slide-in;
+}
+
+/* Shared elements (e.g. hero capture field → wizard writing card, logo). */
+::view-transition-group(.morph) {
+  animation-duration: 620ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: rontee-vt-via-blur;
+}
+
+/* Theme switch: new theme spreads out as a circle; no crossfade. */
+html.theme-vt::view-transition-old(root),
+html.theme-vt::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-vt::view-transition-new(root) {
+  z-index: 2;
+}
+
+@keyframes rontee-vt-fade-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+@keyframes rontee-vt-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(10px);
+  }
+}
+@keyframes rontee-vt-slide-out {
+  to {
+    translate: var(--vt-offset) 0;
+  }
+}
+@keyframes rontee-vt-slide-in {
+  from {
+    translate: var(--vt-offset) 0;
+  }
+}
+@keyframes rontee-vt-via-blur {
+  35% {
+    filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

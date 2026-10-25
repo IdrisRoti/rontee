@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
+import { Shared, SHARED } from "@/components/shared/page-transition";
 import { EASE, SPRING } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -57,10 +58,13 @@ export function QuickCapture({
   className,
   id = "quick-capture",
   showSuggestions = true,
+  shared = false,
 }: {
   className?: string;
   id?: string;
   showSuggestions?: boolean;
+  /** Morphs into the wizard's writing card on navigation (one per page). */
+  shared?: boolean;
 }) {
   const router = useRouter();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -71,67 +75,72 @@ export function QuickCapture({
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     const q = value.trim();
+    // Navigation is a React transition: the field morphs into the wizard card.
     router.push(q ? `/reminders/new?q=${encodeURIComponent(q)}` : "/reminders/new");
   };
+
+  const box = (
+    <motion.div
+      animate={{ scale: focused ? 1.012 : 1 }}
+      transition={SPRING.soft}
+      className={cn(
+        "group relative flex h-16 items-center gap-2 rounded-full border bg-surface p-2 pl-6 shadow-float transition-colors duration-300",
+        focused ? "border-border-strong" : "border-border",
+      )}
+    >
+      <label htmlFor={id} className="sr-only">
+        What do you want to remember?
+      </label>
+      <div className="relative min-w-0 flex-1">
+        <input
+          ref={inputRef}
+          id={id}
+          name="q"
+          autoComplete="off"
+          maxLength={280}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          placeholder={focused ? "What do you want to remember?" : ""}
+          className="w-full bg-transparent text-base tracking-[-0.01em] text-foreground outline-none placeholder:text-faint"
+        />
+        {!value && !focused && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 flex items-center truncate text-base tracking-[-0.01em] text-faint"
+          >
+            {placeholder}
+            <span className="animate-caret text-foreground/50" />
+          </span>
+        )}
+      </div>
+      <button
+        type="submit"
+        className="group/btn relative flex h-12 shrink-0 items-center gap-2 overflow-hidden rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-transform duration-200 active:scale-[0.97]"
+      >
+        <span className="hidden sm:inline">Remember this</span>
+        <span className="sm:hidden">Start</span>
+        <span className="relative flex size-4 overflow-hidden">
+          <ArrowRight
+            size={16}
+            aria-hidden
+            className="absolute transition-transform duration-300 ease-out-expo group-hover/btn:translate-x-5"
+          />
+          <ArrowRight
+            size={16}
+            aria-hidden
+            className="absolute -translate-x-5 transition-transform duration-300 ease-out-expo group-hover/btn:translate-x-0"
+          />
+        </span>
+      </button>
+    </motion.div>
+  );
 
   return (
     <div className={cn("w-full", className)}>
       <form onSubmit={submit} role="search" aria-label="Start a reminder">
-        <motion.div
-          animate={{ scale: focused ? 1.012 : 1 }}
-          transition={SPRING.soft}
-          className={cn(
-            "group relative flex h-16 items-center gap-2 rounded-full border bg-surface p-2 pl-6 shadow-float transition-colors duration-300",
-            focused ? "border-border-strong" : "border-border",
-          )}
-        >
-          <label htmlFor={id} className="sr-only">
-            What do you want to remember?
-          </label>
-          <div className="relative min-w-0 flex-1">
-            <input
-              ref={inputRef}
-              id={id}
-              name="q"
-              autoComplete="off"
-              maxLength={280}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              placeholder={focused ? "What do you want to remember?" : ""}
-              className="w-full bg-transparent text-base tracking-[-0.01em] text-foreground outline-none placeholder:text-faint"
-            />
-            {!value && !focused && (
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 flex items-center truncate text-base tracking-[-0.01em] text-faint"
-              >
-                {placeholder}
-                <span className="animate-caret text-foreground/50" />
-              </span>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="group/btn relative flex h-12 shrink-0 items-center gap-2 overflow-hidden rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-transform duration-200 active:scale-[0.97]"
-          >
-            <span className="hidden sm:inline">Remember this</span>
-            <span className="sm:hidden">Start</span>
-            <span className="relative flex size-4 overflow-hidden">
-              <ArrowRight
-                size={16}
-                aria-hidden
-                className="absolute transition-transform duration-300 ease-out-expo group-hover/btn:translate-x-5"
-              />
-              <ArrowRight
-                size={16}
-                aria-hidden
-                className="absolute -translate-x-5 transition-transform duration-300 ease-out-expo group-hover/btn:translate-x-0"
-              />
-            </span>
-          </button>
-        </motion.div>
+        {shared ? <Shared name={SHARED.capture}>{box}</Shared> : box}
       </form>
 
       {showSuggestions && (

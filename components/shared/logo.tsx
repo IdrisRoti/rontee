@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Shared, SHARED } from "@/components/shared/page-transition";
 import { cn } from "@/lib/utils";
 
 type MarkProps = {
@@ -62,14 +63,18 @@ export function Logo({ className, markClassName, compact = false }: LogoProps) {
   );
 }
 
+/** Home link. The logo is a shared element, so it glides between pages instead of reappearing. */
 export function LogoLink({ className, compact }: LogoProps) {
   return (
-    <Link
-      href="/"
-      aria-label="Rontee home"
-      className={cn("rounded-lg transition-opacity hover:opacity-80", className)}
-    >
-      <Logo compact={compact} />
-    </Link>
+    <Shared name={SHARED.logo}>
+      <Link
+        href="/"
+        aria-label="Rontee home"
+        transitionTypes={["nav-back"]}
+        className={cn("rounded-lg transition-opacity hover:opacity-80", className)}
+      >
+        <Logo compact={compact} />
+      </Link>
+    </Shared>
   );
 }

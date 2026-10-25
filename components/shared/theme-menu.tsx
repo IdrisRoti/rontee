@@ -7,9 +7,8 @@ import { Contrast, Moon, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SPRING } from "@/lib/motion";
+import { transitionTheme, type ThemeChoice } from "@/lib/theme-transition";
 import { cn } from "@/lib/utils";
-
-type ThemeChoice = "light" | "system" | "dark";
 
 const THEME_OPTIONS: ReadonlyArray<{ value: ThemeChoice; label: string; Icon: typeof Sun }> = [
   { value: "light", label: "Light", Icon: Sun },
@@ -111,9 +110,15 @@ export function ThemeMenu({
                   role="menuitemradio"
                   aria-checked={active}
                   type="button"
-                  onClick={() => {
-                    setTheme(value);
+                  onClick={(e) => {
+                    // Keyboard activation has no pointer position — reveal from the button instead.
+                    const r = e.currentTarget.getBoundingClientRect();
+                    const origin =
+                      e.detail === 0
+                        ? { x: r.left + r.width / 2, y: r.top + r.height / 2 }
+                        : { x: e.clientX, y: e.clientY };
                     setOpen(false);
+                    transitionTheme(value, setTheme, origin);
                   }}
                   className={cn(
                     "relative flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm transition-colors",

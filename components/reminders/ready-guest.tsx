@@ -1,141 +1,64 @@
 "use client";
 
-import { Check, Lock, Mail } from "lucide-react";
+import Link from "next/link";
+import { Lock, Mail, PencilLine } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { GoogleMark } from "@/components/auth/auth-widgets";
-import { FadeUp } from "@/components/shared/motion";
-import { ICON_SIZES } from "@/lib/icons";
-import {
-  dateRepeatSummary,
-  formatTimingDate,
-  timingLabel,
-  type RepeatOption,
-  type TimingOffset,
-} from "@/lib/reminder-draft";
-
-type ReadyGuestProps = {
-  what: string;
-  date: Date;
-  repeat: RepeatOption;
-  timings: TimingOffset[];
-};
+import { FadeIn } from "@/components/shared/kinetic";
+import { Button } from "@/components/ui/button";
 
 /**
- * "Reminder Ready" guest gate — the draft is held in local storage
- * while the guest creates an account, per the Stitch flow.
+ * Guest gate copy + actions. The draft is held in local storage while
+ * they create an account (see wizard), then restored on `?recovered=1`.
  */
-export function ReadyGuest({ what, date, repeat, timings }: ReadyGuestProps) {
+export function ReadyGuest({ onEdit }: { onEdit: () => void }) {
   return (
-    <FadeUp y={20} className="flex w-full flex-col items-center text-center">
-      <div
-        aria-hidden
-        className="mb-6 flex size-12 items-center justify-center rounded-full border border-accent/20 bg-accent-subtle text-accent-soft shadow-subtle"
-      >
-        <Check size={24} strokeWidth={2.2} />
-      </div>
+    <div className="flex flex-col items-center text-center">
+      <FadeIn immediate delay={0.35}>
+        <h1 id="wizard-heading" tabIndex={-1} className="type-h1 text-balance outline-none">
+          Your reminder is <span className="type-serif">ready!</span>
+        </h1>
+      </FadeIn>
+      <FadeIn immediate delay={0.45}>
+        <p className="type-body-lg mx-auto mt-4 max-w-md text-pretty text-muted">
+          Create a free account to keep it safe and get your nudges by email and notification.
+        </p>
+      </FadeIn>
 
-      <p className="mb-2 text-xs font-semibold tracking-wider text-accent-soft uppercase">
-        Reminder ready · Step completed
-      </p>
-      <h1 id="wizard-heading" tabIndex={-1} className="mb-3 text-3xl font-bold tracking-tight text-foreground outline-none sm:text-4xl">
-        Your reminder is ready.
-      </h1>
-      <p className="mb-8 max-w-md text-sm leading-relaxed text-muted">
-        Create a free account to save it permanently and receive your
-        reminders.
-      </p>
-
-      <section
-        aria-label="Reminder summary"
-        className="mb-8 w-full rounded-2xl border border-border bg-surface p-6 text-left shadow-elevated"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span aria-hidden className="size-2 shrink-0 rounded-full bg-accent" />
-              <h2 className="truncate text-lg font-semibold text-foreground">
-                {what.trim()}
-              </h2>
-            </div>
-            <p className="mt-1 pl-4 text-xs text-muted">
-              {dateRepeatSummary(date, repeat)}
-            </p>
-          </div>
-          <span className="inline-flex shrink-0 items-center rounded-full border border-accent/20 bg-accent-subtle px-2.5 py-1 text-xs font-medium whitespace-nowrap text-accent-soft">
-            Captured
-          </span>
-        </div>
-
-        <div className="my-5 border-t border-border/60" aria-hidden />
-
-        <div>
-          <span className="mb-3 block text-[11px] font-semibold tracking-wider text-muted uppercase">
-            Your reminders
-          </span>
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-            {timings.map((offset) => (
-              <div
-                key={offset}
-                className="flex items-center gap-2.5 rounded-xl border border-border bg-surface-subtle p-3 text-xs font-medium sm:px-3 sm:py-2.5"
-              >
-                <span
-                  aria-hidden
-                  className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-subtle text-accent-soft"
-                >
-                  <Check size={14} strokeWidth={2.2} />
-                </span>
-                <span className="flex min-w-0 flex-1 items-center justify-between gap-2 sm:flex-col sm:items-start sm:gap-0">
-                  <span className="truncate font-semibold text-foreground">
-                    {timingLabel(offset)}
-                  </span>
-                  <span className="shrink-0 text-xs font-normal text-muted sm:mt-0.5 sm:text-[10px]">
-                    {formatTimingDate(date, offset)}
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section aria-label="Account creation" className="flex w-full flex-col gap-3">
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-full rounded-xl border-border py-3.5 font-semibold shadow-subtle"
-          asChild
-        >
+      <FadeIn immediate delay={0.55} className="mt-8 flex w-full max-w-sm flex-col gap-2.5">
+        <Button asChild variant="secondary" size="lg" className="w-full">
           <a href="#" aria-label="Continue with Google (coming soon)">
             <GoogleMark />
-            <span>Continue with Google</span>
+            Continue with Google
           </a>
         </Button>
-        <Button
-          type="button"
-          className="w-full rounded-xl bg-foreground py-3.5 font-semibold text-background shadow-subtle hover:bg-foreground/90"
-          asChild
-        >
-          <a href="/signup">
-            <Mail size={ICON_SIZES.compact} aria-hidden className="opacity-80" />
-            <span>Create account with email</span>
-          </a>
+        <Button asChild size="lg" className="w-full">
+          <Link href="/signup" transitionTypes={["nav-forward"]}>
+            <Mail aria-hidden />
+            Sign up with email
+          </Link>
         </Button>
-      </section>
+      </FadeIn>
 
-      <p className="mt-5 text-center text-xs text-muted">
-        Already have an account?{" "}
-        <a
-          href="/login"
-          className="ml-1 font-semibold text-accent-soft transition-opacity hover:opacity-80"
+      <FadeIn immediate delay={0.65}>
+        <p className="mt-5 text-sm text-muted">
+          Already have an account?{" "}
+          <Link href="/login" transitionTypes={["nav-forward"]} className="font-semibold text-foreground underline-offset-4 hover:underline">
+            Log in
+          </Link>
+        </p>
+        <p className="mt-6 flex items-center justify-center gap-2 text-[13px] text-muted">
+          <Lock size={14} aria-hidden />
+          We’ll hold onto it while you sign up.
+        </p>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="mx-auto mt-4 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
         >
-          Log in
-        </a>
-      </p>
-      <div className="mt-6 flex items-center justify-center gap-2 text-xs text-muted">
-        <Lock size={14} aria-hidden className="shrink-0 text-accent-soft" />
-        <span>Your reminder is safely held while you set up your account.</span>
-      </div>
-    </FadeUp>
+          <PencilLine size={14} aria-hidden /> Change something
+        </button>
+      </FadeIn>
+    </div>
   );
 }

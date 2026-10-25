@@ -116,10 +116,12 @@ export function Navbar() {
           <div className="flex items-center gap-1">
             <ThemeMenu className="hidden sm:block" />
             <Button asChild variant="ghost" size="sm" className="hidden h-9 md:inline-flex">
-              <Link href="/login">Log in</Link>
+              <Link href="/login" transitionTypes={["nav-forward"]}>
+                Log in
+              </Link>
             </Button>
             <Button asChild size="sm" className="h-9 px-4">
-              <Link href="/reminders/new">
+              <Link href="/reminders/new" transitionTypes={["nav-forward"]}>
                 <span className="hidden sm:inline">Start a reminder</span>
                 <span className="sm:hidden">Start</span>
               </Link>
@@ -182,7 +184,7 @@ export function Navbar() {
               className="flex items-center gap-3"
             >
               <Button asChild size="lg" className="flex-1">
-                <Link href="/reminders/new" onClick={() => setOpen(false)}>
+                <Link href="/reminders/new" transitionTypes={["nav-forward"]} onClick={() => setOpen(false)}>
                   Start a reminder
                 </Link>
               </Button>

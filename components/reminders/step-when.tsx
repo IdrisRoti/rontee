@@ -2,227 +2,262 @@
 
 import * as React from "react";
 import {
+  addDays,
   addMonths,
   format,
-  getDay,
   getDaysInMonth,
+  isBefore,
   isSameDay,
+  isSameMonth,
   isToday,
+  startOfDay,
   startOfMonth,
   subMonths,
 } from "date-fns";
-import { ArrowRight, CalendarDays, ChevronLeft, ChevronRight, Repeat } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, Repeat } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { FadeUp } from "@/components/shared/motion";
-import { ICON_SIZES } from "@/lib/icons";
+import { EASE, SPRING } from "@/lib/motion";
+import { REPEAT_OPTIONS, repeatFeedback, type RepeatOption } from "@/lib/reminder-draft";
 import { cn } from "@/lib/utils";
-import {
-  REPEAT_OPTIONS,
-  repeatFeedback,
-  type RepeatOption,
-} from "@/lib/reminder-draft";
+import { FlowActions, StepHeading } from "./step-ui";
 
-const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] as const;
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 type StepWhenProps = {
-  what: string;
   date: Date | null;
+  dateGuessed: boolean;
   repeat: RepeatOption;
   onDateChange: (date: Date) => void;
   onRepeatChange: (repeat: RepeatOption) => void;
-  onEditWhat: () => void;
+  onBack: () => void;
   onContinue: () => void;
 };
 
-/**
- * Step 2 "When" — date picker calendar plus repeat cadence,
- * from the Stitch create-reminder flow.
- */
-export function StepWhen({
-  what,
-  date,
-  repeat,
-  onDateChange,
-  onRepeatChange,
-  onEditWhat,
-  onContinue,
-}: StepWhenProps) {
-  const [visibleMonth, setVisibleMonth] = React.useState<Date>(() =>
-    date ? startOfMonth(date) : startOfMonth(new Date()),
-  );
+/** Step 2 — "When is it?" Friendly calendar, quick picks, repeat switch. */
+export function StepWhen({ date, dateGuessed, repeat, onDateChange, onRepeatChange, onBack, onContinue }: StepWhenProps) {
+  const today = React.useMemo(() => startOfDay(new Date()), []);
+  const [month, setMonth] = React.useState<Date>(() => startOfMonth(date ?? today));
+  const [dir, setDir] = React.useState<1 | -1>(1);
 
-  const selected: Date = date ?? new Date();
-  const monthStart = startOfMonth(visibleMonth);
-  const leadBlanks = getDay(monthStart);
-  const daysInMonth = getDaysInMonth(visibleMonth);
-  const feedback = repeatFeedback(repeat, selected);
+  const showMonth = (next: Date) => {
+    const m = startOfMonth(next);
+    if (isSameMonth(m, month)) return;
+    setDir(isBefore(m, month) ? -1 : 1);
+    setMonth(m);
+  };
+
+  const pick = (d: Date) => {
+    onDateChange(d);
+    showMonth(d);
+  };
+
+  const quick = [
+    { label: "Today", date: today },
+    { label: "Tomorrow", date: addDays(today, 1) },
+    { label: "In a week", date: addDays(today, 7) },
+    { label: "In a month", date: addMonths(today, 1) },
+  ];
+
+  // Monday-first grid
+  const lead = (startOfMonth(month).getDay() + 6) % 7;
+  const days = getDaysInMonth(month);
 
   return (
-    <FadeUp y={20} className="flex w-full flex-col">
-      <div className="mb-6 text-left">
-        <span className="mb-2 inline-block text-[11px] font-bold tracking-wider text-accent-soft uppercase">
-          Step 2 of 3 · Date
-        </span>
-        <h1 id="wizard-heading" tabIndex={-1} className="text-3xl font-bold tracking-tight text-foreground outline-none sm:text-4xl lg:text-[42px] lg:leading-tight">
-          When is it?
-        </h1>
-        <p className="mt-2 text-base font-normal text-muted sm:text-lg">
-          Choose the date you want Rontee to remember.
-        </p>
-      </div>
-
-      <div className="mb-6 flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-muted shadow-subtle">
-        <span className="font-medium text-muted">Reminder:</span>
-        <span className="min-w-0 flex-1 truncate font-semibold text-foreground">
-          &ldquo;{what.trim()}&rdquo;
-        </span>
-        <button
-          type="button"
-          onClick={onEditWhat}
-          className="ml-auto shrink-0 text-xs font-medium text-accent-soft transition-opacity hover:opacity-80"
-        >
-          Edit
-        </button>
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <div>
-          <span id="reminder-date-label" className="mb-2 block text-sm font-medium text-foreground">
-            Date
-          </span>
-          <div
-            role="group"
-            aria-labelledby="reminder-date-label"
-            className="flex w-full items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-subtle transition-colors"
+    <div>
+      <StepHeading title="When is" accent="it?">
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={dateGuessed && date ? "guessed" : "plain"}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3 }}
+            className="inline-flex items-start gap-2"
           >
-            <span className="text-lg font-semibold text-foreground">
-              {format(selected, "MMMM d, yyyy")}
-            </span>
-            <span aria-hidden className="p-1 text-accent-soft">
-              <CalendarDays size={ICON_SIZES.prominent} />
-            </span>
+            {dateGuessed && date ? (
+              <>
+                <span aria-hidden className="mt-[0.6em] size-2 shrink-0 rounded-full bg-ember" />
+                We spotted {format(date, "d MMMM")} in your note. Change it if you need to.
+              </>
+            ) : (
+              "Pick the day you want to remember."
+            )}
+          </motion.span>
+        </AnimatePresence>
+      </StepHeading>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {quick.map((q) => {
+          const active = date ? isSameDay(date, q.date) : false;
+          return (
+            <button
+              key={q.label}
+              type="button"
+              aria-pressed={active}
+              onClick={() => pick(q.date)}
+              className={cn(
+                "rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 hover:-translate-y-0.5",
+                active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-surface hover:border-border-strong",
+              )}
+            >
+              {q.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Calendar */}
+      <div className="rounded-[28px] border border-border bg-surface p-4 shadow-elevated sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="relative h-7 flex-1 overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false} custom={dir}>
+              <motion.span
+                key={month.toISOString()}
+                custom={dir}
+                variants={{
+                  enter: (d: number) => ({ opacity: 0, y: d * 14 }),
+                  center: { opacity: 1, y: 0 },
+                  exit: (d: number) => ({ opacity: 0, y: d * -14 }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: EASE.outExpo }}
+                className="absolute inset-0 flex items-center text-lg font-semibold tracking-tight"
+              >
+                {format(month, "MMMM yyyy")}
+              </motion.span>
+            </AnimatePresence>
           </div>
-
-          <div className="mt-2.5 rounded-2xl border border-border bg-surface p-5 shadow-subtle">
-            <div className="mb-4 flex items-center justify-between border-b border-border/60 pb-2">
-              <span className="text-base font-semibold tracking-tight text-foreground">
-                {format(visibleMonth, "MMMM yyyy")}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  aria-label="Previous month"
-                  onClick={() => setVisibleMonth((m) => subMonths(m, 1))}
-                  className="rounded-lg p-1.5 text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
-                >
-                  <ChevronLeft size={ICON_SIZES.compact} aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next month"
-                  onClick={() => setVisibleMonth((m) => addMonths(m, 1))}
-                  className="rounded-lg p-1.5 text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
-                >
-                  <ChevronRight size={ICON_SIZES.compact} aria-hidden />
-                </button>
-              </div>
-            </div>
-
-            <div className="mb-2 grid grid-cols-7 gap-1 text-center">
-              {WEEKDAYS.map((day) => (
-                <span key={day} className="py-1 text-xs font-medium text-muted">
-                  {day}
-                </span>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium">
-              {Array.from({ length: leadBlanks }, (_, i) => (
-                <span key={`blank-${i}`} aria-hidden />
-              ))}
-              {Array.from({ length: daysInMonth }, (_, i) => {
-                const day = new Date(
-                  visibleMonth.getFullYear(),
-                  visibleMonth.getMonth(),
-                  i + 1,
-                );
-                const isSelected = isSameDay(day, selected);
-                const isCurrentDay = isToday(day);
-                return (
-                  <button
-                    key={i + 1}
-                    type="button"
-                    onClick={() => onDateChange(day)}
-                    aria-pressed={isSelected}
-                    aria-label={format(day, "MMMM d, yyyy")}
-                    className={cn(
-                      "rounded-lg py-2 transition",
-                      isSelected
-                        ? "bg-accent font-bold text-accent-foreground shadow-subtle"
-                        : "text-muted hover:bg-surface-subtle hover:text-foreground",
-                      !isSelected &&
-                        isCurrentDay &&
-                        "ring-1 ring-accent/60 ring-inset",
-                    )}
-                  >
-                    {i + 1}
-                  </button>
-                );
-              })}
-            </div>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Previous month"
+              onClick={() => showMonth(subMonths(month, 1))}
+              className="flex size-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
+            >
+              <ChevronLeft size={18} aria-hidden />
+            </button>
+            <button
+              type="button"
+              aria-label="Next month"
+              onClick={() => showMonth(addMonths(month, 1))}
+              className="flex size-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
+            >
+              <ChevronRight size={18} aria-hidden />
+            </button>
           </div>
         </div>
 
-        <fieldset className="pt-2">
-          <legend className="mb-3 block text-base font-medium text-foreground">
-            Does this repeat?
-          </legend>
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4" role="radiogroup" aria-label="Recurrence frequency">
-            {REPEAT_OPTIONS.map((option) => {
-              const isSelected = repeat === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  onClick={() => onRepeatChange(option.value)}
-                  className={cn(
-                    "flex items-center justify-center rounded-xl px-3.5 py-3 text-sm transition text-nowrap",
-                    isSelected
-                      ? "border-2 border-accent bg-accent-subtle font-semibold text-accent-soft shadow-subtle"
-                      : "border border-border bg-surface font-medium text-muted hover:border-accent/50 hover:text-foreground",
-                  )}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-          {feedback && (
-            <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent-soft">
-              <Repeat size={ICON_SIZES.compact} aria-hidden className="shrink-0" />
-              {feedback}
-            </p>
-          )}
-        </fieldset>
+        <div className="mb-1 grid grid-cols-7 text-center">
+          {WEEKDAYS.map((d) => (
+            <span key={d} className="py-1 text-xs font-medium text-faint">
+              {d}
+            </span>
+          ))}
+        </div>
+
+        <div className="relative overflow-hidden">
+          <AnimatePresence mode="popLayout" initial={false} custom={dir}>
+            <motion.div
+              key={month.toISOString()}
+              custom={dir}
+              variants={{
+                enter: (d: number) => ({ opacity: 0, x: d * 60, filter: "blur(4px)" }),
+                center: { opacity: 1, x: 0, filter: "blur(0px)" },
+                exit: (d: number) => ({ opacity: 0, x: d * -60, filter: "blur(4px)" }),
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.4, ease: EASE.outExpo }}
+              className="grid grid-cols-7 gap-1"
+            >
+              {Array.from({ length: lead }, (_, i) => (
+                <span key={`b${i}`} aria-hidden />
+              ))}
+              {Array.from({ length: days }, (_, i) => {
+                const day = new Date(month.getFullYear(), month.getMonth(), i + 1);
+                const selected = date ? isSameDay(day, date) : false;
+                const past = isBefore(day, today);
+                return (
+                  <div key={i} className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => pick(day)}
+                      aria-pressed={selected}
+                      aria-label={format(day, "EEEE d MMMM yyyy")}
+                      className={cn(
+                        "relative flex size-10 items-center justify-center rounded-full text-[15px] transition-colors duration-200 sm:size-11",
+                        selected ? "font-semibold text-primary-foreground" : past ? "text-faint hover:bg-surface-subtle" : "hover:bg-surface-subtle",
+                      )}
+                    >
+                      {selected && (
+                        <motion.span layoutId="day-pill" transition={SPRING.snappy} className="absolute inset-0 rounded-full bg-primary" />
+                      )}
+                      <span className="relative">{i + 1}</span>
+                      {isToday(day) && (
+                        <span
+                          aria-hidden
+                          className={cn("absolute bottom-1 size-1 rounded-full", selected ? "bg-primary-foreground" : "bg-ember")}
+                        />
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
-      <div className="mt-8 flex flex-col items-center justify-center">
-        <Button
-          type="button"
-          onClick={onContinue}
-          className="w-full rounded-full px-8 py-3.5 text-base font-semibold shadow-elevated sm:w-auto sm:min-w-[200px]"
-        >
-          Continue
-          <ArrowRight size={ICON_SIZES.compact} aria-hidden />
-        </Button>
-        <span className="mt-3 text-xs text-muted">Step 2 of 3</span>
-        <p className="mt-3 max-w-sm text-center text-sm text-muted">
-          No account needed yet · You can create this reminder before signing
-          up.
-        </p>
-      </div>
-    </FadeUp>
+      {/* Repeat */}
+      <fieldset className="mt-8">
+        <legend className="mb-3 text-base font-semibold">Does it come round again?</legend>
+        <div role="radiogroup" aria-label="Repeat" className="grid grid-cols-2 gap-1 rounded-2xl bg-surface-subtle p-1 sm:grid-cols-4">
+          {REPEAT_OPTIONS.map((o) => {
+            const active = repeat === o.value;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => onRepeatChange(o.value)}
+                className={cn(
+                  "relative rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200",
+                  active ? "text-foreground" : "text-muted hover:text-foreground",
+                )}
+              >
+                {active && (
+                  <motion.span layoutId="repeat-thumb" transition={SPRING.snappy} className="absolute inset-0 rounded-xl bg-surface shadow-subtle" />
+                )}
+                <span className="relative">{o.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 h-5 text-sm text-muted">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {date && (
+              <motion.p
+                key={`${repeat}-${date.toDateString()}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.3, ease: EASE.outQuart }}
+                className="flex items-center gap-1.5"
+              >
+                <Repeat size={14} aria-hidden className="shrink-0" />
+                {repeatFeedback(repeat, date)}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </div>
+      </fieldset>
+
+      <FlowActions onBack={onBack} onNext={onContinue} nextDisabled={!date} hint={!date ? "Pick a day to carry on." : undefined} />
+    </div>
   );
 }

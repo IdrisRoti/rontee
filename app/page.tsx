@@ -9,6 +9,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { Navbar } from "@/components/landing/navbar";
 import { RememberWall } from "@/components/landing/remember-wall";
 import { SmoothScroll } from "@/components/providers/smooth-scroll";
+import { PageTransition } from "@/components/shared/page-transition";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -66,15 +67,19 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
-      <Navbar />
-      <main className="block w-full">
-        <Hero />
-        <HowItWorks />
-        <RememberWall />
-        <Faq />
-        <FinalCta />
-      </main>
-      <Footer />
+      <PageTransition>
+        <div>
+          <Navbar />
+          <main className="block w-full">
+            <Hero />
+            <HowItWorks />
+            <RememberWall />
+            <Faq />
+            <FinalCta />
+          </main>
+          <Footer />
+        </div>
+      </PageTransition>
     </SmoothScroll>
   );
 }

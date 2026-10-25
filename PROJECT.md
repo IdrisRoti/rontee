@@ -77,6 +77,14 @@ memory, not a productivity tool.
 - Everything respects `prefers-reduced-motion`.
 - Legacy primitives in `components/shared/motion.tsx` (FadeUp, Stagger, Typewriter, Meter) are still used by old screens.
 
+### Transitions — nothing should hard-cut (user requirement, 2026-10-25)
+Every change of page, step, state or component must flow.
+- **Pages:** React `<ViewTransition>` (bundled with Next 16). Wrap each page's content in `<PageTransition>` (`components/shared/page-transition.tsx`) **in page.tsx, not a layout**. Tag links/pushes with `transitionTypes={["nav-forward"]}` / `["nav-back"]` for directional slides; untyped navigations get a blur-crossfade (`page-fade`). CSS lives at the end of `globals.css`.
+- **Shared elements:** `<Shared name={SHARED.x}>` morphs an element across pages (logo; hero capture field → wizard writing card). One instance per name per page. The destination must render **in the same commit** as the navigation: no `useSearchParams` + Suspense fallback on the destination (read `searchParams` in the server page and pass props instead).
+- **Theme switch:** `transitionTheme()` (`lib/theme-transition.ts`) — circular reveal from the click point via `document.startViewTransition`; applies the theme class synchronously (next-themes only applies it in an effect, too late for the snapshot); `html.theme-vt` scopes the CSS. Instant fallback without support / reduced motion.
+- **In-page states:** framer-motion. Direction-aware slides with blur (`STEP_VARIANTS` in the wizard), `AutoHeight` for panel height, `layoutId` sliding highlights (chips, calendar day, repeat thumb, theme menu), `AnimatePresence mode="popLayout"` for text swaps, shared `layoutId` objects across states (the wizard's `draft-note`).
+- Don't animate CSS variables with framer (use class transitions). Don't define components inside render (remounts kill animations).
+
 ### Brand
 - Logo: `components/shared/logo.tsx` — **R mark** (ink rounded tile, lowercase "r" reaching for a **tomato dot** = the thing remembered) + lowercase **"rontee"** wordmark (real text, inherits Bricolage).
 - Favicon set: `app/icon.svg` (adapts to dark tab bars), `app/favicon.ico` (16/32/48, generated from the mark with sharp), `app/apple-icon.tsx` (180px).
@@ -122,8 +130,8 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 |---|---|---|---|
 | 0 | Foundation (tokens, type, motion, logo, favicon, SEO) | — | ✅ v2 (friendly) 2026-10-25 |
 | 1 | Landing | `/` | 🟡 v2 friendly rebuild 2026-10-25 — awaiting user review |
-| 2 | Create reminder (3 steps) | `/reminders/new` | ⏳ Old design (neutralised by tokens) |
-| 3 | Reminder ready (guest / saved) | `/reminders/new` states | ⏳ Old design |
+| 2 | Create reminder (3 steps) | `/reminders/new` | 🟡 Built 2026-10-25 — awaiting user review |
+| 3 | Reminder ready (guest / saved) | `/reminders/new` states | 🟡 Built with screen 2 (needed for continuous transitions) — awaiting review |
 | 4 | Auth: sign up, log in, forgot, reset | `/signup` `/login` `/forgot-password` `/reset-password` | ⏳ Old design |
 | 5 | Dashboard | `/dashboard` | ⬜ Not built |
 | 6 | Reminders list | `/reminders` | ⬜ |
@@ -141,6 +149,16 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 5. **FAQ** — friendly accordion (+ FAQPage JSON-LD).
 6. **Final CTA** — butter-yellow panel "Go on, what don't *you want to forget?*" + QuickCapture; a polaroid + a note tucked in the corners (lg).
 7. **Footer** — simple, light, handwritten tagline, theme menu.
+
+### Create-reminder flow (`components/reminders/`) — v2
+- `wizard.tsx` orchestrates: steps 1–3 + ready/saved, direction, friendly guesses, AutoHeight, draft persistence. Page (`app/reminders/new/page.tsx`) is dynamic and passes `initialWhat` (`?q=`) and `recovered` (`?recovered=1`); the held draft is read from localStorage after hydration via `useSyncExternalStore` and adopted during render.
+- `draft-note.tsx`: **the draft note** — one `layoutId` object: desktop sidebar (aside), mobile strip (compact), confirmation centrepiece (hero). Writes the title live in handwriting, takes the category colour, pins date/repeat and (from step 3) the nudges; parts are tappable to jump back to that step. `PaperConfetti` burst on ready/saved; "Saved ✓" stamp.
+- Step 1 `step-what.tsx`: writing card (shared with hero capture), example chips, optional category (auto-guessed via `guessCategory` until touched).
+- Step 2 `step-when.tsx`: date auto-picked if mentioned (`guessDate`, next occurrence), repeat auto-guessed (`guessRepeat`) until touched; quick picks; Monday-first calendar with sliding months + sliding day pill; repeat segmented control.
+- Step 3 `step-timings.tsx`: sqrt-scaled lead-up timeline; toggle cards with drawn checks; nudges that would land in the past are disabled and filtered out when entering the step.
+- `ready-guest.tsx` (sign up with Google/email, log in, change something) and `ready-saved.tsx` (lists nudge dates; add another / home).
+- Header: `flow-header.tsx` + `step-progress.tsx` (filling segments, crossfading label, "All done").
+- Draft model gained `category`; `EMPTY_DRAFT.timings` = [7, 1].
 
 ## Gotchas (keep)
 - SVG coordinates computed with trig must be rounded (server vs client `Math.cos` differ in last digits → hydration mismatch).
@@ -162,3 +180,4 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 - **2026-10-25** — Redesign kickoff. Claude takes over design; teal/Manrope/Stitch dropped. Foundation: tokens, motion system, new R mark + wordmark, favicon set, full SEO (metadata, OG image, robots, sitemap, manifest, JSON-LD). Landing v1 (monochrome, WebGL orb, pinned scenes, dark cinematic sections). ThemeMenu moved to `components/shared/theme-menu.tsx`. This file supersedes the (gitignored) HANDOFF.md — don't follow it. Committed + pushed to `main` (07bce10, ebe14c5). Private docs moved to `docs/` (gitignored).
 - **2026-10-25 (v2)** — User: v1 felt "SaaS-like", wanted friendlier, simpler, less chaotic, friendlier copy, more colour. New direction: warm cream + 5 category pastels + tomato; Bricolage Grotesque + Instrument Serif + Caveat (Geist/Geist Mono dropped); paper objects (sticky notes, tear-off calendar) replace WebGL/particles; landing cut to 5 sections; no dark sections, no pinning. Removed gsap, @gsap/react, three, @types/three, lib/webgl, marquee/manifesto/unburden/use-cases/visuals. Added `lib/categories.ts`, `components/landing/paper.tsx`, `remember-wall.tsx`.
 - **2026-10-25 (v2.1)** — Added 6 CC0 photos as polaroids (hero, wall, CTA); `Polaroid` component. Dark mode lightened to a warm evening charcoal (#27231E) at the user's request; cream-tinted paper in dark.
+- **2026-10-25 (screen 2+3)** — Create-reminder flow + ready states rebuilt in the friendly style with continuous transitions: page view transitions (crossfade/directional, logo + capture-field morph), circular theme reveal, direction-aware step slides, auto-height panel, travelling draft note, sliding highlights. `/reminders/new` now dynamic (searchParams via props) so the morph can pair.
