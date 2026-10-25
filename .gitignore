@@ -42,3 +42,6 @@ next-env.d.ts
 
 # opencode
 HANDOFF.md
+# private reference material (kept out of public/ and out of git)
+/docs/product-design-inspo/
+/docs/product-plan/

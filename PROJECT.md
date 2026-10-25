@@ -10,7 +10,7 @@
 Remembers important dates (birthdays, anniversaries, renewals, subscriptions,
 deadlines) and nudges by email + web push. Not a calendar, not a to-do app.
 
-Product rules (from `public/product-plan/*.pdf` — still binding):
+Product rules (from `docs/product-plan/*.pdf`, gitignored — still binding):
 - **Guest-first**: create the first reminder before signing up; the draft must survive auth (no loss, no duplicates).
 - **Exactly three creation steps**: 1 Remember (what) → 2 When (date, repeat) → 3 Remind me (advance offsets). Show "Step N of 3 · X left". Back never loses data. No channel picker in the flow (channels live in Settings).
 - **View ≠ Edit**: Reminder Details (read) and Edit Reminder are separate screens.
@@ -22,7 +22,7 @@ Product rules (from `public/product-plan/*.pdf` — still binding):
 
 Claude owns the design. The old Stitch screens and the **visual** parts of the PDF
 design brief (teal, Manrope, "no glass / no parallax / subtle motion only") are
-**overridden**. Visual reference: `public/product-design-inspo/` (26 images).
+**overridden**. Visual reference: `docs/product-design-inspo/` (26 images, gitignored — never put them back in `public/`).
 Motion references: sooft.work, useaccrue.com, bdsn.club, eszterbial.com, apple.com,
 unseen.co, lusion.co.
 
