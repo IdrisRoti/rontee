@@ -11,12 +11,14 @@ import {
   guessCategory,
   guessDate,
   guessRepeat,
-  loadDraft,
+  clearDraft,
   saveDraft,
   type ReminderDraft,
   type RepeatOption,
   type TimingOffset,
 } from "@/lib/reminder-draft";
+import { useHeldDraft, useWide } from "@/lib/use-client";
+import { Shared, SHARED } from "@/components/shared/page-transition";
 import { DraftNote, PaperConfetti, type EditTarget } from "./draft-note";
 import { FlowHeader } from "./flow-header";
 import { ReadyGuest } from "./ready-guest";
@@ -31,27 +33,6 @@ const ORDER: ReadonlyArray<WizardStep> = [1, 2, 3, "ready", "saved"];
 
 function sortTimings(timings: TimingOffset[]): TimingOffset[] {
   return [...timings].sort((a, b) => TIMING_OFFSETS.indexOf(a) - TIMING_OFFSETS.indexOf(b));
-}
-
-const noopSubscribe = () => () => {};
-
-// Cached so useSyncExternalStore gets a stable snapshot (loadDraft builds a new object each call).
-let heldCache: ReminderDraft | null | undefined;
-function heldDraft() {
-  if (heldCache === undefined) heldCache = loadDraft();
-  return heldCache;
-}
-
-function useWide() {
-  return React.useSyncExternalStore(
-    (cb) => {
-      const mq = window.matchMedia("(min-width: 1024px)");
-      mq.addEventListener("change", cb);
-      return () => mq.removeEventListener("change", cb);
-    },
-    () => window.matchMedia("(min-width: 1024px)").matches,
-    () => true,
-  );
 }
 
 /** Direction-aware step slide: forward exits left / enters from right. */
@@ -83,7 +64,7 @@ export function ReminderWizard({ initialWhat = "", recovered = false }: { initia
 
   // Back from signup: the held draft lives in localStorage, which the server can't see.
   // Read it after hydration (server snapshot = null) and adopt it once, during render.
-  const held = React.useSyncExternalStore(noopSubscribe, () => (recovered ? heldDraft() : null), () => null);
+  const held = useHeldDraft(recovered);
   const [adopted, setAdopted] = React.useState(false);
   if (held && !adopted) {
     setAdopted(true);
@@ -91,9 +72,10 @@ export function ReminderWizard({ initialWhat = "", recovered = false }: { initia
     setStep("saved");
   }
 
-  // Hold the draft while the guest creates an account.
+  // Hold the draft while the guest creates an account; let it go once it's saved.
   React.useEffect(() => {
     if (step === "ready") saveDraft(draft);
+    if (step === "saved") clearDraft();
   }, [step, draft]);
 
   const goTo = (next: WizardStep) => {
@@ -260,7 +242,10 @@ export function ReminderWizard({ initialWhat = "", recovered = false }: { initia
               >
                 <div className="relative mb-10 w-full max-w-[420px]">
                   <PaperConfetti />
-                  <DraftNote draft={draft} size="hero" stamp={step === "saved" ? "saved" : null} />
+                  {/* Shared with the auth pages: the note travels to signup and back. */}
+                  <Shared name={SHARED.draft}>
+                    <DraftNote draft={draft} size="hero" stamp={step === "saved" ? "saved" : null} />
+                  </Shared>
                 </div>
                 {step === "ready" && <ReadyGuest onEdit={() => goTo(3)} />}
                 {step === "saved" && <ReadySaved draft={draft} onCreateAnother={reset} />}

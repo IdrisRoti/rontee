@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { LoginForm } from "@/components/auth/login-form";
+import { PageTransition } from "@/components/shared/page-transition";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -9,11 +10,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/login" },
 };
 
-/** Standalone login from Stitch. Frontend preview until auth lands. */
+/** Log in. A held guest draft comes along and is saved after login. */
 export default function LoginPage() {
   return (
-    <AuthLayout headerAction={{ label: "Create Account", href: "/signup" }}>
-      <LoginForm />
-    </AuthLayout>
+    <PageTransition>
+      <AuthLayout art="login" showDraft headerAction={{ label: "Sign up", href: "/signup" }}>
+        <LoginForm />
+      </AuthLayout>
+    </PageTransition>
   );
 }

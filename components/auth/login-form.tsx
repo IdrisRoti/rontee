@@ -2,120 +2,130 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FadeUp } from "@/components/shared/motion";
-import { ICON_SIZES } from "@/lib/icons";
-import { GoogleButton, OrDivider, PasswordField } from "./auth-widgets";
+import { useHeldDraft } from "@/lib/use-client";
+import {
+  AuthFootnote,
+  AuthHeading,
+  AuthSwap,
+  GoogleButton,
+  LINK,
+  OrDivider,
+  PasswordField,
+  SubmitButton,
+  TextField,
+  emailError,
+  usePretendRequest,
+} from "./auth-widgets";
 
 /**
- * Standalone login from Stitch. Frontend preview only:
- * validates locally, then shows a signed-in confirmation.
- * No backend session is created yet.
+ * Log in. Frontend preview: validates locally and pretends to sign in.
+ * A held guest draft is handed back to the wizard as saved.
  */
 export function LoginForm() {
+  const held = useHeldDraft();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [tried, setTried] = React.useState(false);
   const [done, setDone] = React.useState(false);
+  const { pending, run } = usePretendRequest(() => setDone(true));
 
-  if (done) {
-    return (
-      <FadeUp y={16} className="flex flex-col">
-        <div
-          aria-hidden
-          className="mb-6 flex size-12 items-center justify-center rounded-full border border-accent/30 bg-accent-subtle text-accent-soft"
-        >
-          <Check size={24} strokeWidth={2.2} />
-        </div>
-        <h2 className="mb-2 text-3xl font-semibold tracking-tight text-foreground">
-          Welcome back
-        </h2>
-        <p className="mb-8 text-sm leading-relaxed text-muted">
-          You&rsquo;re signed in as{" "}
-          <span className="font-semibold text-foreground">{email}</span> in this
-          preview. Full sessions arrive with the backend.
-        </p>
-        <Button className="h-12 w-full rounded-xl" asChild>
-          <Link href="/">
-            Back to home
-            <ArrowRight size={ICON_SIZES.compact} aria-hidden />
-          </Link>
-        </Button>
-      </FadeUp>
-    );
-  }
+  const errors = {
+    email: tried ? emailError(email) : undefined,
+    password: tried && !password ? "Don’t forget your password! (We see the irony.)" : undefined,
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setTried(true);
+    if (emailError(email) || !password) return;
+    run();
+  };
 
   return (
-    <FadeUp y={16} className="flex flex-col">
-      <h2 className="mb-2 text-3xl font-semibold tracking-tight text-foreground">
-        Welcome back
-      </h2>
-      <p className="mb-8 text-sm text-muted">
-        Log in to keep your important reminders close.
-      </p>
+    <AuthSwap stateKey={done ? "done" : "form"} dir={done ? 1 : -1}>
+      {!done ? (
+        <div>
+          <AuthHeading title="Welcome" accent="back!">
+            {held
+              ? "Log in and we’ll pop your new reminder into your account."
+              : "Good to see you. Your reminders are right where you left them."}
+          </AuthHeading>
 
-      <div className="mb-6">
-        <GoogleButton label="Continue with Google" />
-      </div>
-      <div className="mb-6">
-        <OrDivider />
-      </div>
+          <GoogleButton />
+          <OrDivider />
 
-      <form
-        className="flex flex-col gap-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setDone(true);
-        }}
-      >
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="login-email">Email address</Label>
-          <Input
-            id="login-email"
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="name@example.com"
-            className="h-12 rounded-xl"
-          />
+          <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
+            <TextField
+              id="login-email"
+              label="Email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={setEmail}
+              error={errors.email}
+            />
+            <PasswordField
+              id="login-password"
+              label="Password"
+              autoComplete="current-password"
+              placeholder="Your password"
+              value={password}
+              onChange={setPassword}
+              error={errors.password}
+              labelExtra={
+                <Link href="/forgot-password" className="text-[13px] font-medium text-muted underline-offset-4 transition-colors hover:text-foreground hover:underline">
+                  Forgot it?
+                </Link>
+              }
+            />
+            <SubmitButton pending={pending} pendingLabel="Logging you in…">
+              Log in
+            </SubmitButton>
+          </form>
+
+          <AuthFootnote>
+            New here?{" "}
+            <Link href="/signup" className={LINK}>
+              Make a free account
+            </Link>
+          </AuthFootnote>
         </div>
-        <PasswordField
-          id="login-password"
-          label="Password"
-          placeholder="Enter your password"
-          autoComplete="current-password"
-          value={password}
-          onChange={setPassword}
-          labelExtra={
-            <a
-              href="/forgot-password"
-              className="text-sm font-medium text-accent-soft transition-opacity hover:opacity-80"
-            >
-              Forgot password?
-            </a>
-          }
-        />
-        <Button type="submit" className="mt-2 h-12 w-full rounded-xl">
-          Log in
-          <ArrowRight size={ICON_SIZES.default} aria-hidden />
-        </Button>
-      </form>
-
-      <p className="mt-6 text-center text-sm text-muted">
-        Don&rsquo;t have an account?{" "}
-        <a
-          href="/signup"
-          className="ml-1 font-medium text-accent-soft transition-opacity hover:opacity-80"
-        >
-          Create one
-        </a>
-      </p>
-    </FadeUp>
+      ) : (
+        <div>
+          <AuthHeading title="And you’re" accent="in." focusOnMount>
+            {held
+              ? "Your new reminder is saved with the rest."
+              : "This is a preview for now, so there’s nothing to show yet. Real accounts are on the way."}
+          </AuthHeading>
+          {held ? (
+            <Button asChild size="lg" className="group/next w-full">
+              <Link href="/reminders/new?recovered=1" transitionTypes={["nav-forward"]}>
+                See my reminder
+                <ArrowRight aria-hidden className="transition-transform duration-300 ease-out-expo group-hover/next:translate-x-1" />
+              </Link>
+            </Button>
+          ) : (
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <Button asChild size="lg" className="flex-1">
+                <Link href="/reminders/new" transitionTypes={["nav-forward"]}>
+                  <Plus aria-hidden />
+                  Add a reminder
+                </Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg" className="flex-1">
+                <Link href="/" transitionTypes={["nav-back"]}>
+                  Back to home
+                </Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </AuthSwap>
   );
 }

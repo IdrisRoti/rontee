@@ -34,4 +34,6 @@ export function Shared({ name, children }: { name: string; children: React.React
 export const SHARED = {
   logo: "rontee-logo",
   capture: "rontee-capture",
+  /** The guest's draft note: wizard "ready" ↔ signup/login. */
+  draft: "rontee-draft",
 } as const;

@@ -132,7 +132,7 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 | 1 | Landing | `/` | 🟡 v2 friendly rebuild 2026-10-25 — awaiting user review |
 | 2 | Create reminder (3 steps) | `/reminders/new` | 🟡 Built 2026-10-25 — awaiting user review |
 | 3 | Reminder ready (guest / saved) | `/reminders/new` states | 🟡 Built with screen 2 (needed for continuous transitions) — awaiting review |
-| 4 | Auth: sign up, log in, forgot, reset | `/signup` `/login` `/forgot-password` `/reset-password` | ⏳ Old design |
+| 4 | Auth: sign up, log in, forgot, reset | `/signup` `/login` `/forgot-password` `/reset-password` | 🟡 Rebuilt 2026-10-26 — awaiting user review |
 | 5 | Dashboard | `/dashboard` | ⬜ Not built |
 | 6 | Reminders list | `/reminders` | ⬜ |
 | 7 | Reminder details | `/reminders/[id]` | ⬜ |
@@ -160,14 +160,24 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 - Header: `flow-header.tsx` + `step-progress.tsx` (filling segments, crossfading label, "All done").
 - Draft model gained `category`; `EMPTY_DRAFT.timings` = [7, 1].
 
+### Auth screens (`components/auth/`) — v2
+- `auth-layout.tsx`: calm header (shared logo, context link, theme, close), form left (max 440), "paper corner" right (lg+), small footer. Pages wrap it in `<PageTransition>`.
+- `auth-art.tsx`: per-page dotted desk of draggable paper (signup: Mum polaroid + 3 notes; login: tear-off calendar + roses + "Welcome back!"; forgot: "happens to the best of us" note + Gran polaroid + spam p.s.; reset: fresh-start note + cake polaroid + nudge note) with a handwritten caption.
+- **Held draft travels**: signup/login read the guest draft (`useHeldDraft`, `lib/use-client.ts`) and show it instead of the desk (desktop: on the board; mobile: compact strip above the form). It shares `SHARED.draft` with the wizard's ready/saved note, so it morphs wizard → signup → back to "Saved ✓". After signup/login with a draft: "See my reminder" → `/reminders/new?recovered=1`. The wizard clears the draft once adopted (no duplicates).
+- Fields (`auth-widgets.tsx`): 52px rounded inputs, friendly inline errors (shown after first submit), show/hide toggle, 3-segment strength meter, pending submit (900ms pretend request), `AuthSwap` form↔done slide with auto height, heading focus on state change.
+- Fields: signup = optional first name + email + password (no confirm field — toggle + meter instead); login = email + password ("Forgot it?"); forgot → "Check your inbox" with 30s resend cool-down; reset = one new password + meter → "All sorted." → log in.
+- Copy: "Make yourself *at home.*" / "Let's keep it *safe.*" (with draft), "Welcome *back!*", "Forgot your *password?*", "Pick a new *password.*"
+
 ## Gotchas (keep)
 - SVG coordinates computed with trig must be rounded (server vs client `Math.cos` differ in last digits → hydration mismatch).
 - If you ever add GSAP pinning back: ScrollTrigger disables pin spacing when the pinned element's parent is flex — keep `<main>` block and set `pinSpacing: true`.
 - ThemeMenu reads next-themes only after mount (`useSyncExternalStore` mounted flag) to avoid hydration mismatch. Keep this pattern for any theme-dependent attributes.
 - framer `drag` + `touch-none` blocks page scroll on phones — only enable drag on fine pointers.
+- `Draggable` uses **numeric** drag limits measured with a ResizeObserver (`useDragLimits` in `paper.tsx`), not framer ref constraints: those re-project items on every window resize from a measurement taken mid drop-in, which flung items to mirrored spots (also hit full-page screenshots).
 - `html`/`body` use `overflow-x: clip` (not hidden).
 - Flex `truncate` children need `min-w-0 flex-1`.
 - If `tsc` fails only inside `.next/dev/types`, delete `.next` and re-run.
+- Shared helpers: `useMediaQuery` / `useWide` / `useHeldDraft` in `lib/use-client.ts`; `loadDraft()` is cached by the raw localStorage string (stable `useSyncExternalStore` snapshot); `clearDraft()`.
 - Wizard (old): draft held in localStorage `rontee:reminder-draft` across the signup detour; `?recovered=1` restores to saved; `?q=` prefills step 1. Step transitions scroll to top + focus `#wizard-heading`.
 
 ## Open items / to confirm with user
@@ -181,3 +191,4 @@ Read `node_modules/next/dist/docs/` before using Next APIs (see AGENTS.md).
 - **2026-10-25 (v2)** — User: v1 felt "SaaS-like", wanted friendlier, simpler, less chaotic, friendlier copy, more colour. New direction: warm cream + 5 category pastels + tomato; Bricolage Grotesque + Instrument Serif + Caveat (Geist/Geist Mono dropped); paper objects (sticky notes, tear-off calendar) replace WebGL/particles; landing cut to 5 sections; no dark sections, no pinning. Removed gsap, @gsap/react, three, @types/three, lib/webgl, marquee/manifesto/unburden/use-cases/visuals. Added `lib/categories.ts`, `components/landing/paper.tsx`, `remember-wall.tsx`.
 - **2026-10-25 (v2.1)** — Added 6 CC0 photos as polaroids (hero, wall, CTA); `Polaroid` component. Dark mode lightened to a warm evening charcoal (#27231E) at the user's request; cream-tinted paper in dark.
 - **2026-10-25 (screen 2+3)** — Create-reminder flow + ready states rebuilt in the friendly style with continuous transitions: page view transitions (crossfade/directional, logo + capture-field morph), circular theme reveal, direction-aware step slides, auto-height panel, travelling draft note, sliding highlights. `/reminders/new` now dynamic (searchParams via props) so the morph can pair.
+- **2026-10-26 (screen 4)** — Auth screens rebuilt in the friendly style: shared shell with paper-desk art per page, the guest's held draft morphs wizard → signup/login → saved, friendlier fields (optional name, no confirm-password, strength meter, inline errors, pending state), forgot-password resend cool-down. Wizard now clears the held draft after adopting it. Fixed `Draggable` items jumping to mirrored positions on window resize (numeric drag limits), which also affected the landing hero.

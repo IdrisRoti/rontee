@@ -3,41 +3,40 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 
+import { LogoLink } from "@/components/shared/logo";
 import { ThemeMenu } from "@/components/shared/theme-menu";
-import { Logo } from "@/components/shared/logo";
-import { ICON_SIZES } from "@/lib/icons";
+import { useHeldDraft, useWide } from "@/lib/use-client";
+import { AuthArt, HeldDraft, type AuthArtKind } from "./auth-art";
 
 type AuthLayoutProps = {
-  /** Top-right context link, e.g. Log in on signup. Omit on purpose-built screens. */
+  /** Which paper corner to show beside the form. */
+  art: AuthArtKind;
+  /** Top-right context link, e.g. "Log in" on signup. */
   headerAction?: { label: string; href: string };
+  /** Show the guest's held draft (signup/login only). */
+  showDraft?: boolean;
   children: React.ReactNode;
 };
 
 /**
- * Shared standalone-auth shell from Stitch:
- * minimal header (wordmark + context link + theme + close),
- * editorial panel beside a 440px form card, quiet footer.
+ * Friendly auth shell: calm header, the form on the left and a paper
+ * corner on the right. When a guest arrives with a held draft, the draft
+ * note itself comes along (shared element) so they can see it's safe.
  */
-export function AuthLayout({ headerAction, children }: AuthLayoutProps) {
-  return (
-    <div className="flex min-h-dvh w-full max-w-full flex-col overflow-x-clip bg-background text-foreground">
-      <header className="w-full border-b border-border/60">
-        <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center justify-between px-4 md:h-20 md:px-8 lg:px-10">
-          <Link
-            href="/"
-            aria-label="Rontee home"
-            className="rounded-md transition-opacity hover:opacity-90"
-          >
-            <span className="[&_svg]:h-7 md:[&_svg]:h-8">
-              <Logo />
-            </span>
-          </Link>
+export function AuthLayout({ art, headerAction, showDraft = false, children }: AuthLayoutProps) {
+  const wide = useWide();
+  const held = useHeldDraft(showDraft);
 
-          <div className="flex items-center gap-1 sm:gap-3">
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <header className="w-full">
+        <div className="mx-auto flex h-20 max-w-[1120px] items-center justify-between gap-3 px-4 sm:px-8">
+          <LogoLink compact />
+          <div className="flex items-center gap-1">
             {headerAction && (
               <Link
                 href={headerAction.href}
-                className="px-2 py-1 text-sm font-medium text-muted transition-colors hover:text-accent-soft"
+                className="flex h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors hover:bg-surface-subtle"
               >
                 {headerAction.label}
               </Link>
@@ -45,48 +44,44 @@ export function AuthLayout({ headerAction, children }: AuthLayoutProps) {
             <ThemeMenu />
             <Link
               href="/"
-              aria-label="Close and return home"
-              className="rounded-full p-2 text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
+              transitionTypes={["nav-back"]}
+              className="flex h-10 items-center gap-1.5 rounded-full px-3 text-sm text-muted transition-colors hover:bg-surface-subtle hover:text-foreground"
             >
-              <X size={ICON_SIZES.prominent} aria-hidden />
+              <X size={16} aria-hidden />
+              <span className="hidden sm:inline">Close</span>
+              <span className="sr-only sm:hidden">Close and go home</span>
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="flex w-full max-w-full flex-1 flex-col overflow-x-clip">
-        <div className="mx-auto grid w-full max-w-[1280px] flex-1 grid-cols-1 items-start gap-10 px-4 py-10 sm:py-14 md:px-8 lg:grid-cols-12 lg:gap-16 lg:px-10 lg:pt-16">
-          <section className="hidden lg:col-span-6 lg:block xl:col-span-5" aria-label="About Rontee">
-            <p className="mb-3 text-xs font-semibold tracking-widest text-accent-soft uppercase">
-              Personal memory assistant
-            </p>
-            <h1 className="mb-4 text-3xl leading-[1.15] font-bold tracking-tight text-foreground lg:text-5xl lg:leading-[1.12]">
-              Never forget
-              <br />
-              what matters.
-            </h1>
-            <p className="max-w-md text-base leading-relaxed text-muted lg:text-lg">
-              Keep the moments, people, and dates you never want to forget.
-            </p>
-          </section>
+      <main className="mx-auto grid w-full max-w-[1120px] flex-1 grid-cols-1 items-start gap-16 px-4 pt-4 pb-16 sm:px-8 sm:pt-10 lg:pt-14 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-20 lg:pb-20">
+        <section className="mx-auto w-full max-w-[440px] lg:mx-0">
+          {held && !wide && <HeldDraft draft={held} compact />}
+          {children}
+        </section>
 
-          <section
-            className="flex justify-start lg:col-span-6 lg:justify-end xl:col-span-6 xl:col-start-7"
-            aria-label="Authentication"
-          >
-            <div className="w-full max-w-[440px]">{children}</div>
-          </section>
-        </div>
+        {held ? (
+          wide && (
+            <aside aria-label="Your reminder">
+              <HeldDraft draft={held} />
+            </aside>
+          )
+        ) : (
+          // CSS-hidden on small screens so phones never flash the desk.
+          <aside aria-label="A few things people remember with Rontee" className="hidden lg:block">
+            <AuthArt kind={art} />
+          </aside>
+        )}
       </main>
 
-      <footer className="w-full border-t border-border/60">
-        <div className="mx-auto flex h-16 w-full max-w-[1280px] flex-row items-center justify-between px-4 text-xs text-muted md:px-8 lg:px-10">
-          <span>© 2026 Rontee. All rights reserved.</span>
+      <footer className="w-full">
+        <div className="mx-auto flex h-16 max-w-[1120px] items-center justify-between gap-4 px-4 text-[13px] text-muted sm:px-8">
+          <span>© 2026 Rontee</span>
           <div className="flex items-center gap-4">
             <a href="#" className="transition-colors hover:text-foreground">
               Privacy
             </a>
-            <span aria-hidden>·</span>
             <a href="#" className="transition-colors hover:text-foreground">
               Terms
             </a>

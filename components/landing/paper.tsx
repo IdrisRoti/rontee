@@ -117,15 +117,17 @@ export function Draggable({
   z?: number;
 }) {
   const reduce = useReducedMotion();
+  const [itemRef, limits] = useDragLimits(constraints, enabled);
   return (
     <motion.div
+      ref={itemRef}
       className={cn("absolute", enabled && "cursor-grab touch-none active:cursor-grabbing", className)}
       style={{ zIndex: z, filter: "drop-shadow(0 0px 0px rgb(60 45 20 / 0))" }}
       initial={reduce ? { opacity: 0, rotate } : { opacity: 0, y: -60, rotate: rotate * 3, scale: 1.08 }}
       animate={{ opacity: 1, y: 0, rotate, scale: 1 }}
       transition={{ type: "spring", stiffness: 180, damping: 14, delay }}
       drag={enabled}
-      dragConstraints={constraints}
+      dragConstraints={limits}
       dragElastic={0.18}
       dragTransition={{ bounceStiffness: 300, bounceDamping: 18 }}
       whileHover={enabled ? { scale: 1.03, rotate: rotate * 0.5 } : undefined}
@@ -136,6 +138,48 @@ export function Draggable({
       {children}
     </motion.div>
   );
+}
+
+type Limits = { top: number; left: number; right: number; bottom: number };
+
+/**
+ * How far an item may travel inside its board, as numbers. framer's ref
+ * constraints re-project items on every window resize and bake in whatever
+ * transform the first measurement caught (drop-in, tilt), so items jumped to
+ * mirrored spots on resize. Numbers from plain layout offsets don't.
+ */
+function useDragLimits(board: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [box, setBox] = React.useState<Limits | false>(false);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    const container = board.current;
+    if (!enabled || !el || !container) return;
+    const measure = () => {
+      // Layout position inside the board, plus any CSS `translate` (e.g. -translate-x-1/2).
+      const px = (v: string | undefined, size: number) =>
+        !v ? 0 : v.endsWith("%") ? (parseFloat(v) / 100) * size : parseFloat(v) || 0;
+      const [rawX, rawY] = getComputedStyle(el).translate.split(" ");
+      const tx = px(rawX, el.offsetWidth);
+      const ty = px(rawY, el.offsetHeight);
+      const x = el.offsetLeft + tx;
+      const y = el.offsetTop + ty;
+      setBox({
+        left: -x,
+        top: -y,
+        right: container.clientWidth - x - el.offsetWidth,
+        bottom: container.clientHeight - y - el.offsetHeight,
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [board, enabled]);
+
+  return [ref, box] as const;
 }
 
 /** True on devices with a precise pointer (mouse/trackpad). Touch keeps native scroll. */

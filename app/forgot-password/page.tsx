@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { ForgotForm } from "@/components/auth/forgot-form";
+import { PageTransition } from "@/components/shared/page-transition";
 
 export const metadata: Metadata = {
   title: "Forgot password",
@@ -10,11 +11,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-/** Standalone forgot-password from Stitch. Frontend preview until auth lands. */
+/** Forgot password: email a reset link (preview). */
 export default function ForgotPasswordPage() {
   return (
-    <AuthLayout headerAction={{ label: "Log in", href: "/login" }}>
-      <ForgotForm />
-    </AuthLayout>
+    <PageTransition>
+      <AuthLayout art="forgot" headerAction={{ label: "Log in", href: "/login" }}>
+        <ForgotForm />
+      </AuthLayout>
+    </PageTransition>
   );
 }

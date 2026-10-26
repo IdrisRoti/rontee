@@ -172,10 +172,9 @@ export function saveDraft(draft: ReminderDraft): void {
   }
 }
 
-/** Restores a held draft, or null when absent/invalid/expired shape. */
-export function loadDraft(): ReminderDraft | null {
+/** Parses a stored draft, or null when absent/invalid. */
+function parseDraft(raw: string | null): ReminderDraft | null {
   try {
-    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<StoredDraft>;
     const date = parsed.date ? new Date(parsed.date) : null;
@@ -192,5 +191,29 @@ export function loadDraft(): ReminderDraft | null {
     return { what: parsed.what.slice(0, 280), category, date, repeat, timings };
   } catch {
     return null;
+  }
+}
+
+// Cached by the raw string so useSyncExternalStore gets a stable snapshot.
+let cache: { raw: string | null; draft: ReminderDraft | null } | null = null;
+
+/** The draft held across the signup detour, or null (client only). */
+export function loadDraft(): ReminderDraft | null {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+  } catch {
+    // Storage blocked.
+  }
+  if (!cache || cache.raw !== raw) cache = { raw, draft: parseDraft(raw) };
+  return cache.draft;
+}
+
+/** Forget the held draft once it has been saved (no duplicates). */
+export function clearDraft(): void {
+  try {
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+  } catch {
+    // Storage blocked.
   }
 }

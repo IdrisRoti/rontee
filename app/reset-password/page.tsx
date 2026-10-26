@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { ResetForm } from "@/components/auth/reset-form";
+import { PageTransition } from "@/components/shared/page-transition";
 
 export const metadata: Metadata = {
   title: "Reset password",
@@ -10,11 +11,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-/** Standalone reset-password from Stitch. Frontend preview until auth lands. */
+/** Reset password from the emailed link (preview). */
 export default function ResetPasswordPage() {
   return (
-    <AuthLayout headerAction={{ label: "Log in", href: "/login" }}>
-      <ResetForm />
-    </AuthLayout>
+    <PageTransition>
+      <AuthLayout art="reset" headerAction={{ label: "Log in", href: "/login" }}>
+        <ResetForm />
+      </AuthLayout>
+    </PageTransition>
   );
 }
