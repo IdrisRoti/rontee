@@ -59,12 +59,15 @@ export function QuickCapture({
   id = "quick-capture",
   showSuggestions = true,
   shared = false,
+  center = false,
 }: {
   className?: string;
   id?: string;
   showSuggestions?: boolean;
   /** Morphs into the wizard's writing card on navigation (one per page). */
   shared?: boolean;
+  /** Centre the suggestion chips (centred layouts). */
+  center?: boolean;
 }) {
   const router = useRouter();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -144,7 +147,7 @@ export function QuickCapture({
       </form>
 
       {showSuggestions && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className={cn("mt-4 flex flex-wrap items-center gap-2", center && "justify-center")}>
           <span className="mr-0.5 text-sm text-muted">Or try</span>
           {SUGGESTIONS.map((s) => (
             <button
